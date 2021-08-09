@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  S3BucketName:
+    Description: Input S3 Bucket name.
+    Type: String
+    AllowedPattern: '^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$'
+    MinLength: 3
+    MaxLength: 63
+    ConstraintDescription: Input-Parameter must match pattern '^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$'
+
+Resources:
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html
+  S3BucketForWebSite:
+    Type: AWS::S3::Bucket
+    #DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub "${S3BucketName}"
+      # 静的ウェブサイトホスティング
+      WebsiteConfiguration:
+        # https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/IndexDocumentSupport.html
+        IndexDocument: index.html
+        # https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/CustomErrorDocSupport.html
+        ErrorDocument: error/index.html
+      # ブロックパブリックアクセス
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      # アクセスコントロールリスト
+      AccessControl: Private
+
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-s3-policy.html
+  BucketPolicyForWebSite:
+    Type: AWS::S3::BucketPolicy
+    #DeletionPolicy: Retain
+    Properties:
+      Bucket: !Ref S3BucketForWebSite
+      PolicyDocument:
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "PublicReadGetObject",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": [
+                "s3:GetObject",
+              ],
+              "Resource": [
+                !Join ["", ["arn:aws:s3:::", !Ref S3BucketForWebSite, "/*"]]
+              ]
+            }
+          ]
+        }
+
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html
+  CloudFrontForRedirect:
+    Type: AWS::CloudFront::Distribution
+    #DeletionPolicy: Retain
+    Properties:
+      DistributionConfig:
+        # Origins
+        Origins:
+          - Id: S3WebSite
+            DomainName: !Sub ${S3BucketName}.s3-website-${AWS::Region}.amazonaws.com
+            CustomOriginConfig:
+              ## Protocol
+              OriginProtocolPolicy: http-only
+              ### HTTP port
+              HTTPPort: 80
+              ### Minimum origin SSL protocol
+              OriginSSLProtocols:
+                - TLSv1
+                - TLSv1.1
+                - TLSv1.2
+              ## Additional Settings
+              ### Response timeout
+              OriginReadTimeout: 30
+              ### Keep-alive timeout
+              OriginKeepaliveTimeout: 5
+            ## Enable Origin Shield
+            OriginShield:
+              Enabled: false
+            ## Additional Settings
+            ### Connection attempts
+            ConnectionAttempts: 3
+            ### Connection timeout
+            ConnectionTimeout: 10
+        # Default cache behavior
+        DefaultCacheBehavior:
+          TargetOriginId: S3WebSite
+          Compress: true
+          ## Viewer
+          ### Viewer protocol policy
+          ViewerProtocolPolicy: redirect-to-https
+          ### Allowed HTTP methods
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - PATCH
+            - POST
+            - DELETE
+          ## Cache key and origin requests
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          ## Additional settings
+          SmoothStreaming: false
+        # Settings
+        ## Price class
+        PriceClass: PriceClass_All
+#        ## Alternate domain name (CNAME)
+#        Aliases:
+#          - !Sub ${HostName}
+        ## Supported HTTP versions
+        HttpVersion: http2
+        ## IPv6
+        IPV6Enabled: true
+        ## Description
+        Comment: !Sub ${CFDescription}
+        Enabled: true
