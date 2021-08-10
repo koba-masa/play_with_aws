@@ -49,12 +49,11 @@ Resources:
           - Id: Origin1
             DomainName: !Sub ${S3BucketName}.s3-website-${AWS::Region}.amazonaws.com
             CustomOriginConfig:
-              ## Protocol
-              OriginProtocolPolicy: match-viewer
+              ## Protocol(S3 ウェブサイトエンドポイントはhttpのみ)
+              ### https://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-custom-origin.html
+              OriginProtocolPolicy: http-only
               ### HTTP port
               HTTPPort: 80
-              ### HTTPS port
-              HTTPSPort: 443
               ### Minimum origin SSL protocol
               OriginSSLProtocols:
                 - TLSv1
