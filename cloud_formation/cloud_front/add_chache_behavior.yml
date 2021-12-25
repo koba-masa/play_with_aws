@@ -1,0 +1,65 @@
+################################################################
+# 概要: 既存のディストリビューションにCacheBehaviorを追加する
+# 条件: オリジンが登録済みであること
+# 作成方法: 既存のリソースを仕様(リソースをインポート)
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  General_OriginName:
+    Description: Input 'Origin Name' of Distribution Origins.
+    Type: String
+  General_PathPattern:
+    Description: Input 'Path Pattern' of Cache behavior.
+    Type: String
+  Viewer_AllowedMethods:
+    Description: Input 'Allowed Method' of Cache behavior.('GET, HEAD' or 'GET, HEAD, OPTIONS' or 'GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE')
+    Type: CommaDelimitedList
+    Default: GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE
+  Cache_CachePolicyId:
+    Description: Input 'Cache Policy Id' of Cache behavior.
+    Type: String
+    Default: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+  Cache_OriginRequestPolicyId:
+    Description: Input 'Origin Request Policy Id' of Cache behavior.
+    Type: String
+    Default: acba4595-bd28-49b8-b9fe-13317c0390fa
+Resources:
+  # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html
+  ImportedCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    # スタックを削除してもリソースを残す
+    DeletionPolicy: Retain
+    Properties:
+      DistributionConfig:
+        # ビヘイビア
+        CacheBehaviors:
+            # パスパターン
+          - PathPattern: !Sub ${General_PathPattern}
+            # オリジン
+            TargetOriginId: !Sub ${General_OriginName}
+            # オブジェクトを自動的に圧縮
+            Compress: true
+            # ビューワー
+            ## ビューワープロトコルポリシー
+            ViewerProtocolPolicy: redirect-to-https
+            ## 許可されたHTTPメソッド
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - PATCH
+              - POST
+              - DELETE
+            CachedMethods:
+              - GET
+              - HEAD
+            # キャッシュキーとオリジンリクエスト
+            ## キャッシュポリシー
+            ### https://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html
+            CachePolicyId: !Sub ${Cache_CachePolicyId}
+            ## オリジンリクエストポリシー
+            ### https://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html
+            OriginRequestPolicyId: !Sub ${Cache_OriginRequestPolicyId}
+            # Additional settings
+            SmoothStreaming: false
+        Enabled: true
