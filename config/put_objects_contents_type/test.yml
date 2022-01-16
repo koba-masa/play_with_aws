@@ -1,0 +1,12 @@
+credentials:
+  access_key_id:
+  secret_access_key:
+
+put_object_contents_type:
+  s3:
+    bucket:
+    region:
+    object:
+      file: tmp/files/json/main.json
+      mime: application/json
+      prefix: put_object_contents_type/json
