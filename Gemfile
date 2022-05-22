@@ -8,6 +8,7 @@ gem 'config'
 
 gem 'aws-sdk-core', '~> 3'
 gem 'aws-sdk-s3', '~> 1'
+gem 'aws-sdk-ses', '~> 1'
 
 gem 'rspec', require: false
 gem 'rubocop', require: false

@@ -1,0 +1,9 @@
+credentials:
+  access_key_id:
+  secret_access_key:
+
+ses_text_email_sender:
+  ses:
+    region:
+    to_addresses:
+    from_address:
