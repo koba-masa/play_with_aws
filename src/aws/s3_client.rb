@@ -47,5 +47,9 @@ module Aws
         }
       )
     end
+
+    def copy_object(options)
+      client.copy_object(options)
+    end
   end
 end

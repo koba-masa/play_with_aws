@@ -2,10 +2,14 @@ credentials:
   access_key_id:
   secret_access_key:
 
-put_object_content_type:
-  s3:
+common:
+  s3: &common_s3
     bucket:
     region:
+
+put_object_content_type:
+  s3:
+    <<: *common_s3
     object:
       file: tmp/files/json/main.json
       mime: application/json
