@@ -1,7 +1,7 @@
 require 'config'
 require './src/aws/s3_client'
 
-class PutObjectContetnsType
+class PutObjectContentType
   def initialize(config)
     file_path = File.expand_path(config, Dir.pwd)
     unless File.exist?(file_path) || File.file?(file_path)
@@ -64,13 +64,13 @@ class PutObjectContetnsType
   def s3_client
     @s3_cleint = Aws::S3Client.new(
       bucket,
-      Settings.put_object_contents_type.s3.region,
+      region,
     )
   end
 
   def upload(key, body, content_type=nil)
     options = {
-      bucket: Settings.put_object_contents_type.s3.bucket,
+      bucket: bucket,
       key: key,
       body: body,
     }
@@ -80,19 +80,27 @@ class PutObjectContetnsType
   end
 
   def bucket
-    Settings.put_object_contents_type.s3.bucket
+    settings.s3.bucket
+  end
+
+  def region
+    settings.s3.region
   end
 
   def src_file
-    Settings.put_object_contents_type.s3.object.file
+    settings.s3.object.file
   end
 
   def mime
-    mime = Settings.put_object_contents_type.s3.object.mime
+    settings.s3.object.mime
   end
 
   def prefix
-    Settings.put_object_contents_type.s3.object.prefix
+    settings.s3.object.prefix
+  end
+
+  def settings
+    Settings.put_object_content_type
   end
 
   def output(key, result)
@@ -101,4 +109,4 @@ class PutObjectContetnsType
   end
 end
 
-PutObjectContetnsType.new('config/put_objects_contents_type/development.yml').execute
+PutObjectContentType.new('config/development.yml').execute
