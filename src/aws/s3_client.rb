@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aws-sdk-s3'
 require './src/aws/credential'
 
@@ -11,7 +13,7 @@ module Aws
     def client
       @client ||= Aws::S3::Client.new(
         region: @region,
-        credentials: Credential.credentials,
+        credentials: Credential.credentials
       )
     end
 
@@ -23,7 +25,7 @@ module Aws
       client.list_objects_v2(
         {
           bucket: @bucket_name,
-          prefix: key,
+          prefix: key
         }
       )
     end
@@ -32,7 +34,7 @@ module Aws
       client.get_object(
         {
           bucket: @bucket_name,
-          key: key,
+          key: key
         }
       )
     end
@@ -41,7 +43,7 @@ module Aws
       client.delete_object(
         {
           bucket: @bucket_name,
-          key: key,
+          key: key
         }
       )
     end
