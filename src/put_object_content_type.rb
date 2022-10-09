@@ -1,12 +1,13 @@
+# frozen_string_literal: true
+
 require 'config'
 require './src/aws/s3_client'
 
 class PutObjectContentType
   def initialize(config)
     file_path = File.expand_path(config, Dir.pwd)
-    unless File.exist?(file_path) || File.file?(file_path)
-      raise StandardError("File is not found. : #{file_path}")
-    end
+    raise StandardError("File is not found. : #{file_path}") unless File.exist?(file_path) || File.file?(file_path)
+
     Config.load_and_set_settings(file_path)
   end
 
@@ -19,8 +20,8 @@ class PutObjectContentType
 
   # mimeを指定しないでアップロード場合
   def upload_without_mime
-    puts "mimeを指定せずにアップロードした場合"
-    file_name = "without_mime.json"
+    puts 'mimeを指定せずにアップロードした場合'
+    file_name = 'without_mime.json'
     key = "#{prefix}/#{file_name}"
     s3_client.delete(key)
     upload(key, src_file, nil)
@@ -29,8 +30,8 @@ class PutObjectContentType
 
   # mime未指定後、指定してアップロード場合
   def upload_with_mime_after_without_mime
-    puts "mime未指定後、指定してアップロード場合"
-    file_name = "with_mime_after_without_mime.json"
+    puts 'mime未指定後、指定してアップロード場合'
+    file_name = 'with_mime_after_without_mime.json'
     key = "#{prefix}/#{file_name}"
     s3_client.delete(key)
     upload(key, src_file, nil)
@@ -41,8 +42,8 @@ class PutObjectContentType
 
   # mimeを指定してアップロード場合
   def upload_with_mime
-    puts "mimeを指定してアップロード場合"
-    file_name = "with_mime.json"
+    puts 'mimeを指定してアップロード場合'
+    file_name = 'with_mime.json'
     key = "#{prefix}/#{file_name}"
     s3_client.delete(key)
     upload(key, src_file, mime)
@@ -51,8 +52,8 @@ class PutObjectContentType
 
   # mime指定後、指定せずにアップロード場合
   def upload_without_mime_after_with_mime
-    puts "mime指定後、指定せずにアップロード場合"
-    file_name = "without_mime_after_with_mime.json"
+    puts 'mime指定後、指定せずにアップロード場合'
+    file_name = 'without_mime_after_with_mime.json'
     key = "#{prefix}/#{file_name}"
     s3_client.delete(key)
     upload(key, src_file, mime)
@@ -64,17 +65,17 @@ class PutObjectContentType
   def s3_client
     @s3_cleint = Aws::S3Client.new(
       bucket,
-      region,
+      region
     )
   end
 
-  def upload(key, body, content_type=nil)
+  def upload(key, body, content_type = nil)
     options = {
       bucket: bucket,
       key: key,
-      body: body,
+      body: body
     }
-    options = options.merge({content_type: content_type}) unless content_type.nil?
+    options = options.merge({ content_type: content_type }) unless content_type.nil?
 
     s3_client.upload_put_object(options)
   end
