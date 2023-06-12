@@ -63,7 +63,7 @@ class PutObjectContentType
   end
 
   def s3_client
-    @s3_cleint = Aws::S3Client.new(
+    @s3_client = Aws::S3Client.new(
       bucket,
       region
     )
