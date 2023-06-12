@@ -1,3 +1,5 @@
+.env
+
 # Created by https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,ruby
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,visualstudiocode,ruby
 
@@ -42,6 +44,7 @@ Temporary Items
 /test/tmp/
 /test/version_tmp/
 /tmp/
+!/tmp/files
 
 # Used by dotenv library to load environment variables.
 # .env
@@ -67,7 +70,6 @@ build-iPhoneSimulator/
 ## Documentation cache and generated files:
 /.yardoc/
 /_yardoc/
-/doc/
 /rdoc/
 
 ## Environment normalization:

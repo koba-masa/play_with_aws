@@ -1,0 +1,11 @@
+| file_type | content_type | Key | ContentType |
+| :-- | :-- | :-- | :-- |
+| json | なし | put_object_with_content_type/put_object_json_without_content_type.json | binary/octet-stream |
+| json | text/json | put_object_with_content_type/put_object_json_with_content_type.json | text/json |
+| json | text/html | put_object_with_content_type/put_object_json_with_content_type_html.json | text/html |
+| html | なし | put_object_with_content_type/put_object_html_without_content_type.html | binary/octet-stream |
+| html | text/html | put_object_with_content_type/put_object_html_with_content_type.html | text/html |
+| html | text/json | put_object_with_content_type/put_object_html_with_content_type_json.json | text/json |
+| text | なし | put_object_with_content_type/put_object_text_without_content_type.text | binary/octet-stream |
+| text | text/plain | put_object_with_content_type/put_object_text_with_content_type.text | text/plain |
+| text | text/json | put_object_with_content_type/put_object_text_with_content_type_json.json | text/json |
