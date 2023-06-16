@@ -6,7 +6,7 @@
 ## 検証
 
 ### 検証コード
-- `src/scripts/s3/put_object_with_content_type.rb`
+- [`src/scripts/s3/put_object_with_content_type.rb`](/src/scripts/s3/put_object_with_content_type.rb)
 ```sh
 docker-compose run --rm app bundle exec ruby src/scripts/s3/put_object_with_content_type.rb
 ```
