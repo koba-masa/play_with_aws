@@ -1,0 +1,23 @@
+common:
+  credentials:
+    access_key_id: <%= ENV['AWS_ACCESS_KEY'] %>
+    secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
+  s3: &common_s3
+    bucket: <%= ENV['S3_BUCKET'] %>
+    region: <%= ENV['S3_REGION'] %>
+
+copy_object_with_metadata:
+  s3:
+    <<: *common_s3
+  upload_file: tmp/files/json/sample.json
+put_object_with_metadata:
+  s3:
+    <<: *common_s3
+  upload_file: tmp/files/json/sample.json
+put_object_with_content_type:
+  s3:
+    <<: *common_s3
+  upload_files:
+    json: tmp/files/sample.json
+    html: tmp/files/sample.html
+    text: tmp/files/sample.text
