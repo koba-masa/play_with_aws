@@ -2,7 +2,7 @@
 
 ## 検証
 ### 検証コード
-- `src/scripts/s3/put_object_with_metadata.rb`
+- [`src/scripts/s3/put_object_with_metadata.rb`](/src/scripts/s3/put_object_with_metadata.rb)
 ```sh
 docker-compose run --rm app bundle exec ruby src/scripts/s3/put_object_with_metadata.rb
 ```
