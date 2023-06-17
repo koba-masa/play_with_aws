@@ -30,6 +30,10 @@ module S3
       client.copy_object(options)
     end
 
+    def list_objects_v2(prefix)
+      client.list_objects_v2({bucket:, prefix: prefix,})
+    end
+
     def region
       settings.s3.region
     end
