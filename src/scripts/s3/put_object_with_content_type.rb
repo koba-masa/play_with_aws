@@ -4,7 +4,7 @@ require './src/scripts/s3/base'
 
 module S3
   class PutObjectWithContentType < Base
-    HEADER = ['file_type', 'content_type', 'Key', 'ContentType'].freeze
+    HEADER = %w[file_type content_type Key ContentType].freeze
 
     def initialize
       super
@@ -41,7 +41,7 @@ module S3
       content_type = 'text/json'
       key = "#{prefix}/put_object_json_with_content_type.json"
       body = settings.upload_files.json
-      options = options(key, body, {content_type: content_type})
+      options = options(key, body, { content_type: })
 
       delete_object(key)
       put_object(options)
@@ -53,7 +53,7 @@ module S3
       content_type = 'text/html'
       key = "#{prefix}/put_object_json_with_content_type_html.json"
       body = settings.upload_files.json
-      options = options(key, body, {content_type: content_type})
+      options = options(key, body, { content_type: })
 
       delete_object(key)
       put_object(options)
@@ -77,7 +77,7 @@ module S3
       content_type = 'text/html'
       key = "#{prefix}/put_object_html_with_content_type.html"
       body = settings.upload_files.html
-      options = options(key, body, {content_type: content_type})
+      options = options(key, body, { content_type: })
 
       delete_object(key)
       put_object(options)
@@ -89,7 +89,7 @@ module S3
       content_type = 'text/json'
       key = "#{prefix}/put_object_html_with_content_type_json.json"
       body = settings.upload_files.json
-      options = options(key, body, {content_type: content_type})
+      options = options(key, body, { content_type: })
 
       delete_object(key)
       put_object(options)
@@ -113,7 +113,7 @@ module S3
       content_type = 'text/plain'
       key = "#{prefix}/put_object_text_with_content_type.txt"
       body = settings.upload_files.text
-      options = options(key, body, {content_type: content_type})
+      options = options(key, body, { content_type: })
 
       delete_object(key)
       put_object(options)
@@ -125,7 +125,7 @@ module S3
       content_type = 'text/json'
       key = "#{prefix}/put_object_text_with_content_type_json.json"
       body = settings.upload_files.text
-      options = options(key, body, {content_type: content_type})
+      options = options(key, body, { content_type: })
 
       delete_object(key)
       put_object(options)
@@ -138,9 +138,9 @@ module S3
 
     def options(destination_key, body, additional_options)
       options = {
-        bucket: bucket,
+        bucket:,
         key: destination_key,
-        body: body
+        body:,
       }
       options = options.merge(additional_options) unless additional_options.nil?
       options
@@ -158,7 +158,7 @@ module S3
           content_type,
           key,
           response.content_type,
-        ]
+        ],
       )
     end
   end

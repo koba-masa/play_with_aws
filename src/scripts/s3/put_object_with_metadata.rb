@@ -4,7 +4,7 @@ require './src/scripts/s3/base'
 
 module S3
   class PutObjectWithMetadata < Base
-    HEADER = ['metadata', 'Key', 'メタデータ'].freeze
+    HEADER = %w[metadata Key メタデータ].freeze
 
     def initialize
       super
@@ -22,7 +22,6 @@ module S3
     def without_metadata
       metadata = 'なし'
       key = "#{prefix}/without_metadata.json"
-      body = settings.upload_file
       additional_options = nil
 
       delete_object(key)
@@ -33,8 +32,7 @@ module S3
     def without_metadata_after_with
       metadata = 'あり→なし'
       key = "#{prefix}/without_metadata_after_with.json"
-      body = settings.upload_file
-      additional_options = {metadata: {'x-amz-metadata-other' => 'without_metadata_after_with'}}
+      additional_options = { metadata: { 'x-amz-metadata-other' => 'without_metadata_after_with' } }
 
       delete_object(key)
       put_object(options(key, additional_options))
@@ -46,8 +44,7 @@ module S3
     def with_metadata
       metadata = 'あり'
       key = "#{prefix}/with_metadata.json"
-      body = settings.upload_file
-      additional_options = {metadata: {'x-amz-metadata-other' => 'with_metadata'}}
+      additional_options = { metadata: { 'x-amz-metadata-other' => 'with_metadata' } }
 
       delete_object(key)
       put_object(options(key, additional_options))
@@ -57,8 +54,7 @@ module S3
     def with_metadata_after_without
       metadata = 'なし→あり'
       key = "#{prefix}/with_metadata_after_without.json"
-      body = settings.upload_file
-      additional_options = {metadata: {'x-amz-metadata-other' => 'with_metadata_after_without'}}
+      additional_options = { metadata: { 'x-amz-metadata-other' => 'with_metadata_after_without' } }
 
       delete_object(key)
       put_object(options(key, nil))
@@ -77,9 +73,9 @@ module S3
 
     def options(destination_key, additional_options)
       options = {
-        bucket: bucket,
+        bucket:,
         key: destination_key,
-        body: body
+        body:,
       }
       options = options.merge(additional_options) unless additional_options.nil?
       options
@@ -96,7 +92,7 @@ module S3
           metadata,
           key,
           response.metadata,
-        ]
+        ],
       )
     end
   end

@@ -4,7 +4,7 @@ require './src/scripts/s3/base'
 
 module S3
   class ListObjectsV2WithPrefix < Base
-    HEADER = ['prefix', '結果'].freeze
+    HEADER = %w[prefix 結果].freeze
 
     def initialize
       super
@@ -21,7 +21,7 @@ module S3
     end
 
     def prefix_without_delimiter
-      target_prefix = "#{prefix}"
+      target_prefix = prefix.to_s
       result(target_prefix)
     end
 
@@ -42,11 +42,11 @@ module S3
 
     def setup
       target_prefix = "#{prefix}/"
-      files = ["sample1.json", "sample2.json"]
+      files = ['sample1.json', 'sample2.json']
       files.each do |file|
         key = "#{target_prefix}#{file}"
         delete_object(key)
-        put_object({bucket: bucket, key: key, body: body,})
+        put_object({ bucket:, key:, body: })
       end
       result(target_prefix)
     end
@@ -70,7 +70,7 @@ module S3
         [
           prefix,
           keys.join('<br>'),
-        ]
+        ],
       )
     end
   end

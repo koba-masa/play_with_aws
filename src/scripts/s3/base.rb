@@ -11,11 +11,11 @@ module S3
     end
 
     def client
-      @client ||= Aws::S3::Client.new(region: region, credentials: Aws::Credential.credentials)
+      @client ||= Aws::S3::Client.new(region:, credentials: Aws::Credential.credentials)
     end
 
     def get_object(key)
-      client.get_object({bucket: bucket, key: key})
+      client.get_object({ bucket:, key: })
     end
 
     def put_object(options)
@@ -23,7 +23,7 @@ module S3
     end
 
     def delete_object(key)
-      client.delete_object({bucket: bucket, key: key})
+      client.delete_object({ bucket:, key: })
     end
 
     def copy_object(options)
@@ -31,7 +31,7 @@ module S3
     end
 
     def list_objects_v2(prefix)
-      client.list_objects_v2({bucket:, prefix: prefix,})
+      client.list_objects_v2({ bucket:, prefix: })
     end
 
     def region
@@ -47,13 +47,13 @@ module S3
     end
 
     def output
-      raise StandardError if @output.nil? or @output.empty?
+      raise StandardError if @output.nil? || @output.empty?
 
       header = @output.shift
-      puts "| #{header.join(" | ")} |"
-      puts "|#{" :-- |" * header.size}"
+      puts "| #{header.join(' | ')} |"
+      puts "|#{' :-- |' * header.size}"
       @output.each do |row|
-        puts "| #{row.join(" | ")} |"
+        puts "| #{row.join(' | ')} |"
       end
     end
   end
