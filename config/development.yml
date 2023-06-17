@@ -21,3 +21,7 @@ put_object_with_content_type:
     json: tmp/files/sample.json
     html: tmp/files/sample.html
     text: tmp/files/sample.text
+list_object_with_prefix:
+  s3:
+    <<: *common_s3
+  upload_files: tmp/files/json/sample.json
