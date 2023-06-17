@@ -4,7 +4,7 @@ require './src/scripts/s3/base'
 
 module S3
   class CopyObjectWithMetadata < Base
-    HEADER = ['metadata', 'metadata_directive', 'Key', 'ContentType', 'CacheControl', 'メタデータ'].freeze
+    HEADER = %w[metadata metadata_directive Key ContentType CacheControl メタデータ].freeze
 
     def initialize
       super
@@ -33,7 +33,7 @@ module S3
     def copy_without_metadata_by_copy
       key = "#{prefix}/copy_without_metadata_by_copy.json"
       additional_options = {
-        metadata_directive: 'COPY'
+        metadata_directive: 'COPY',
       }
       delete_object(key)
       copy_object(options(key, additional_options))
@@ -43,7 +43,7 @@ module S3
     def copy_without_metadata_by_replace
       key = "#{prefix}/copy_without_metadata_by_replace.json"
       additional_options = {
-        metadata_directive: 'REPLACE'
+        metadata_directive: 'REPLACE',
       }
       delete_object(key)
       copy_object(options(key, additional_options))
@@ -56,8 +56,8 @@ module S3
         content_type: 'text/html',
         cache_control: 'max-age=2',
         metadata: {
-          'x-amz-metadata-other' => 'copy_with_metadata_by_none'
-        }
+          'x-amz-metadata-other' => 'copy_with_metadata_by_none',
+        },
       }
       delete_object(key)
       copy_object(options(key, additional_options))
@@ -71,8 +71,8 @@ module S3
         content_type: 'text/html',
         cache_control: 'max-age=2',
         metadata: {
-          'x-amz-metadata-other' => 'copy_with_metadata_by_copy'
-        }
+          'x-amz-metadata-other' => 'copy_with_metadata_by_copy',
+        },
       }
       delete_object(key)
       copy_object(options(key, additional_options))
@@ -86,8 +86,8 @@ module S3
         content_type: 'text/html',
         cache_control: 'max-age=2',
         metadata: {
-          'x-amz-metadata-other' => 'copy_with_metadata_by_replace'
-        }
+          'x-amz-metadata-other' => 'copy_with_metadata_by_replace',
+        },
       }
       delete_object(key)
       copy_object(options(key, additional_options))
@@ -98,15 +98,15 @@ module S3
       delete_object(original_key)
       put_object(
         {
-          bucket: bucket,
+          bucket:,
           key: original_key,
-          body: body,
+          body:,
           content_type: 'application/json',
           cache_control: 'max-age=1',
           metadata: {
-            'x-amz-metadata' => 'setup'
-          }
-        }
+            'x-amz-metadata' => 'setup',
+          },
+        },
       )
       result('初期データ', '', original_key)
     end
@@ -121,9 +121,9 @@ module S3
 
     def options(destination_key, additional_options)
       options = {
-        bucket: bucket,
+        bucket:,
         copy_source: "#{bucket}/#{original_key}",
-        key: destination_key
+        key: destination_key,
       }
       options = options.merge(additional_options) unless additional_options.nil?
       options
@@ -147,7 +147,7 @@ module S3
           response.content_type,
           response.cache_control,
           response.metadata,
-        ]
+        ],
       )
     end
   end
