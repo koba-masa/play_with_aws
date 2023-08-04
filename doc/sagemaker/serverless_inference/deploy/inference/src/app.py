@@ -12,11 +12,11 @@ def ping():
 
 @app.post("/invocations")
 def transformation():
-    body = "hoge"
+    body = "fuga"
     print("start")
     model = None
 
-    #print("== start ls ========")
+    print("== start ls ========")
     # for file in os.listdir("/opt/ml/model"):
     #     print(file)
     #print("====================")
