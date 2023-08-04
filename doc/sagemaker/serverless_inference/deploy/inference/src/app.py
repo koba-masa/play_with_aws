@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 import pickle
+import os
 
 app = FastAPI()
 
@@ -15,14 +16,20 @@ def transformation():
     print("start")
     model = None
 
+    #print("== start ls ========")
+    # for file in os.listdir("/opt/ml/model"):
+    #     print(file)
+    #print("====================")
+
     # with open("/opt/ml/model/model.pkl", "rb") as f_model:
     #     model = pickle.load(f_model)
 
-    #model.predict()
+    # model.predict(body)
 
     print(f"Body: {body}")
 
     return {"invocated": body}
+
 
 if __name__ == "__main__":
     uvicorn.run(
