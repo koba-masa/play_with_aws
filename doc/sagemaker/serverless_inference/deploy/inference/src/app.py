@@ -10,7 +10,9 @@ def ping():
 
 
 @app.post("/invocations")
-def transformation(body: str):
+def transformation():
+    body = "hoge"
+    print("start")
     model = None
 
     # with open("/opt/ml/model/model.pkl", "rb") as f_model:
