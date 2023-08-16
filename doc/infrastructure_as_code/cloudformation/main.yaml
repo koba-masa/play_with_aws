@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+# Description:
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the S3 bucket to create
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration:
+        Status: Suspended
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+      AccessControl: Private
+      LifecycleConfiguration:
+        Rules:
+          - Id: delete_incomplete_multi_part_upload_file
+            AbortIncompleteMultipartUpload:
+                DaysAfterInitiation: 7
+            ExpiredObjectDeleteMarker: false
+            Status: Enabled
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Tag
+          Value: infrastructure_as_code_cf
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Ref BucketName
+        Description: create by cloudformation
+        OriginAccessControlOriginType: s3
+        SigningProtocol: sigv4
+        SigningBehavior: always
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        {
+          "Version": "2012-10-17",
+          "Statement": {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "cloudfront.amazonaws.com"
+            },
+            "Action": "s3:GetObject",
+            "Resource": !Join ["", [!GetAtt S3Bucket.Arn, "/*"]],
+            "Condition": {
+              "StringEquals": {
+                "AWS:SourceArn": !Join ["",
+                  [
+                    "arn:aws:cloudfront::",
+                    !Ref AWS::AccountId,
+                    ":distribution/",
+                    !GetAtt CloudFrontDistribution.Id
+                  ]
+                ]
+              }
+            }
+          }
+        }
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: "play_with_aws_infrastructure_as_code_cf"
+        Enabled: true
+        PriceClass: PriceClass_200
+        HttpVersion: http2
+        IPV6Enabled: false
+        Origins:
+          - Id: DefaultBehaviorBucket
+            DomainName: !Join ["", [!Ref S3Bucket, ".s3.amazonaws.com"]]
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig: {}
+            OriginShield:
+              Enabled: false
+            ConnectionAttempts: 3
+            ConnectionTimeout: 10
+        DefaultCacheBehavior:
+          TargetOriginId: DefaultBehaviorBucket
+          Compress: true
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Tag
+          Value: infrastructure_as_code_cf
