@@ -6,6 +6,7 @@
   - Terraform
 
 ### インフラ構成図
+![インフラ構成図](/doc/infrastructure_as_code/images/infrastructure.svg)
 
 ## 事前準備
 - 共通的に使用するものを以下に示す
