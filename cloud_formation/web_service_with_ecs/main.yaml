@@ -2,10 +2,13 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Description: 'Web Service with ECS'
 
-Conditions:
-  HasNot: !Equals [ 'true', 'false' ]
-
 Resources:
-  NullResource:
-    Type: 'Custom::NullResource'
-    Condition: HasNot
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: play_with_aws_web_service_with_ecs
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
