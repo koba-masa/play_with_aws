@@ -5,6 +5,7 @@
 ## 手順
 
 ### 作成コマンド
+
 ```sh
 aws cloudformation create-stack \
    --stack-name play-with-aws-web-service-with-ecs \
@@ -13,18 +14,19 @@ aws cloudformation create-stack \
 ```
 
 ### 更新コマンド
+
 ```sh
-aws cloudformation update-stack \
-   --stack-name play-with-aws-web-service-with-ecs \
-   --template-body file://main.yaml \
+aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs --template-body file://main.yaml
 ```
 
 ### 削除コマンド
+
 ```sh
 aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs
 ```
 
 ### イベント確認コマンド
+
 ```sh
 aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs
 ```
