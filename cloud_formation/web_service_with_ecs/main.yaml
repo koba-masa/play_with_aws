@@ -18,6 +18,25 @@ Resources:
         - Key: Identifier
           Value: web_service_with_ecs
 
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC # VPC
+      CidrBlock: 10.0.1.0/24 # IPv4 CIDR
+      AvailabilityZone: us-west-2a # アベイラビリティーゾーン
+      MapPublicIpOnLaunch: true # パブリック IPv4 アドレスを自動割り当て
+      # Ipv6CidrBlock: String
+      # Ipv6Native: Boolean
+      # AssignIpv6AddressOnCreation: Boolean
+      # EnableDns64: Boolean # DNS64 を有効化
+      Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs_public_subnet_1
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
