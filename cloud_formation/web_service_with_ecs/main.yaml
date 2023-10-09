@@ -46,3 +46,81 @@ Resources:
           Value: play_with_aws
         - Key: Identifier
           Value: web_service_with_ecs
+
+  ECSTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: play_with_aws_web_service_with_ecs # タスク定義ファミリー名
+      RequiresCompatibilities: # 起動タイプ
+        - FARGATE
+      RuntimePlatform: # オペレーティングシステム／アーキテクチャ
+        OperatingSystemFamily: LINUX
+        CpuArchitecture: X86_64
+      NetworkMode: awsvpc # ネットワークモード
+      Cpu: 256 # タスクサイズ-CPU
+      Memory: 512 # タスクサイズ-メモリ
+      #TaskRoleArn:  # タスクロール
+      ExecutionRoleArn: !Ref IAMRoleExecuteECSTask # 実行ロール
+      ContainerDefinitions: # コンテナ
+        # 必須コンテナ
+        - Name: Nginx # 名前
+          Image: !Join # イメージURI
+            - ''
+            - - !GetAtt ECRRepository.RepositoryUri
+              - ':latest'
+          Essential: true # 必須コンテナ
+          PortMappings: # ポートマッピング
+            - Name: http
+              Protocol: tcp
+              HostPort: 80
+              AppProtocol: http2
+              ContainerPort: 80
+          ReadonlyRootFilesystem: true # 読み取り専用ルートファイルシステム
+          LogConfiguration: # ログ記録
+            LogDriver: awslogs
+            Options: { 'awslogs-group': '/ecs/', 'awslogs-region': 'us-west-2', 'awslogs-stream-prefix': 'ecs', 'awslogs-create-group': 'true' }
+          HealthCheck: # HealthCheck
+              Command:
+                - CMD-SHELL
+                - curl -f http://localhost/ || exit 1
+              Interval: 60
+              Timeout: 60
+              StartPeriod: 30
+              Retries: 2
+          # DependsOn:
+          #   - ContainerDependency
+          # DisableNetworking: Boolean
+          # DnsSearchDomains:
+          #   - String
+          # DnsServers:
+          #   - String
+          # DockerSecurityOptions:
+          #   - String
+          # ExtraHosts:
+          #   - HostEntry
+          # FirelensConfiguration:
+          #   FirelensConfiguration
+          # Hostname: String
+          # Interactive: Boolean
+          # Links:
+          #   - String
+          # LinuxParameters:
+          #   LinuxParameters
+          # MountPoints:
+          #   - MountPoint
+          # Privileged: Boolean
+          # PseudoTerminal: Boolean
+          # ResourceRequirements:
+          #   - ResourceRequirement
+          # Secrets:
+          #   - Secret
+          # SystemControls:
+          #   - SystemControl
+          # User: String
+          # VolumesFrom:
+          #   - VolumeFrom
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
