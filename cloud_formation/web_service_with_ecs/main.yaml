@@ -3,6 +3,18 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: 'Web Service with ECS'
 
 Resources:
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: play_with_aws_web_service_with_ecs # リポジトリ名
+      EmptyOnDelete: true
+      ImageTagMutability: MUTABLE # タブのイミュータビリティ
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
