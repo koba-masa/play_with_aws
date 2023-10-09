@@ -15,6 +15,28 @@ Resources:
         - Key: Identifier
           Value: web_service_with_ecs
 
+  IAMRoleExecuteECSTask:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_web_service_with_ecs_execute_ecs_task
+      Description: play_with_aws_web_service_with_ecs
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ecs-tasks.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:

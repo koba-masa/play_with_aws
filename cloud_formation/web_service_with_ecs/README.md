@@ -9,6 +9,7 @@
 ```sh
 aws cloudformation create-stack \
    --stack-name play-with-aws-web-service-with-ecs \
+   --capabilities CAPABILITY_NAMED_IAM \
    --template-body file://main.yaml \
    --tags Key=Project,Value=play_with_aws Key=Identifier,Value=web_service_with_ecs
 ```
@@ -16,7 +17,9 @@ aws cloudformation create-stack \
 ### 更新コマンド
 
 ```sh
-aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs --template-body file://main.yaml
+aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --template-body file://main.yaml
 ```
 
 ### 削除コマンド
