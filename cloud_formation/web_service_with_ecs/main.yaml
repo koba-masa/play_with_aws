@@ -3,6 +3,21 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: 'Web Service with ECS'
 
 Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: false
+      EnableDnsSupport: false
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
