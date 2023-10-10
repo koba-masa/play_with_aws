@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: 2010-09-09
 
 Description: 'Web Service with ECS'
 
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -17,6 +20,8 @@ Resources:
           Value: play_with_aws
         - Key: Identifier
           Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
 
   PublicSubnet1:
     Type: AWS::EC2::Subnet
@@ -36,6 +41,8 @@ Resources:
           Value: play_with_aws
         - Key: Identifier
           Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
@@ -55,6 +62,8 @@ Resources:
           Value: play_with_aws
         - Key: Identifier
           Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
 
   ECRRepository:
     Type: AWS::ECR::Repository
@@ -67,6 +76,8 @@ Resources:
           Value: play_with_aws
         - Key: Identifier
           Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
 
   IAMRoleExecuteECSTask:
     Type: AWS::IAM::Role
@@ -89,6 +100,8 @@ Resources:
           Value: play_with_aws
         - Key: Identifier
           Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
 
   ECSCluster:
     Type: AWS::ECS::Cluster
@@ -99,6 +112,8 @@ Resources:
           Value: play_with_aws
         - Key: Identifier
           Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
 
   ECSTask:
     Type: AWS::ECS::TaskDefinition
@@ -177,3 +192,5 @@ Resources:
           Value: play_with_aws
         - Key: Identifier
           Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
