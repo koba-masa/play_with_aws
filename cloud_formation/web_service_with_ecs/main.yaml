@@ -230,7 +230,7 @@ Resources:
               HostPort: 80
               AppProtocol: http2
               ContainerPort: 80
-          ReadonlyRootFilesystem: true # 読み取り専用ルートファイルシステム
+          ReadonlyRootFilesystem: false # 読み取り専用ルートファイルシステム
           LogConfiguration: # ログ記録
             LogDriver: awslogs
             Options: { 'awslogs-group': '/ecs/', 'awslogs-region': 'us-west-2', 'awslogs-stream-prefix': 'ecs', 'awslogs-create-group': 'true' }
