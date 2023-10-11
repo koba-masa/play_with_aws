@@ -84,10 +84,10 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
-  SecurityGroupForECS:
+  SecurityGroupForALB:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: play_with_aws_web_service_with_ecs_for_ecs
+      GroupName: play_with_aws_web_service_with_ecs_for_ecs_alb
       GroupDescription: play_with_aws_web_service_with_ecs_for_ecs
       VpcId: !Ref VPC
       SecurityGroupIngress:
@@ -121,6 +121,29 @@ Resources:
       Tags:
         - Key: Name
           Value: play_with_aws_web_service_with_ecs_private_subnet_1
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  SecurityGroupForECS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: play_with_aws_web_service_with_ecs_for_ecs_ecs
+      GroupDescription: play_with_aws_web_service_with_ecs_for_ecs
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - Description: Allow HTTP access from ALB
+          IpProtocol: tcp
+          SourceSecurityGroupId: !Ref SecurityGroupForALB
+          FromPort: 80
+          ToPort: 80
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
         - Key: Project
           Value: play_with_aws
         - Key: Identifier
