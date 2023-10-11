@@ -23,6 +23,19 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
