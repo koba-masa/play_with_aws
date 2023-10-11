@@ -36,6 +36,12 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
+  VPCInternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
