@@ -183,6 +183,28 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: pw-aws-web-service-with-ecs
+      Type: application
+      IpAddressType: ipv4
+      Scheme: internet-facing
+      # LoadBalancerAttributes:
+      #   - LoadBalancerAttribute
+      SecurityGroups:
+        - !Ref SecurityGroupForALB
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
