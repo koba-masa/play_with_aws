@@ -5,16 +5,28 @@
 ## 手順
 
 ### 作成コマンド
+```sh
+aws cloudformation create-stack \
+   --stack-name play-with-aws-web-service-with-ecs-ecr \
+   --capabilities CAPABILITY_NAMED_IAM \
+   --template-body file://ecr.yaml \
+   --tags Key=Project,Value=play_with_aws Key=Identifier,Value=web_service_with_ecs Key=CmBillingGroup,Value=play_with_aws_web_service_with_ecs
+```
 
 ```sh
 aws cloudformation create-stack \
    --stack-name play-with-aws-web-service-with-ecs \
    --capabilities CAPABILITY_NAMED_IAM \
    --template-body file://main.yaml \
-   --tags Key=Project,Value=play_with_aws Key=Identifier,Value=web_service_with_ecs
+   --tags Key=Project,Value=play_with_aws Key=Identifier,Value=web_service_with_ecs Key=CmBillingGroup,Value=play_with_aws_web_service_with_ecs
 ```
 
 ### 更新コマンド
+```sh
+aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs-ecr \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --template-body file://ecr.yaml
+```
 
 ```sh
 aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs \
@@ -23,12 +35,18 @@ aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs 
 ```
 
 ### 削除コマンド
+```sh
+aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs-ecr
+```
 
 ```sh
 aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs
 ```
 
 ### イベント確認コマンド
+```sh
+aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs-ecr
+```
 
 ```sh
 aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs

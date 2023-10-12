@@ -205,20 +205,6 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
-  ECRRepository:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: play_with_aws_web_service_with_ecs # リポジトリ名
-      EmptyOnDelete: true
-      ImageTagMutability: MUTABLE # タブのイミュータビリティ
-      Tags:
-        - Key: Project
-          Value: play_with_aws
-        - Key: Identifier
-          Value: web_service_with_ecs
-        - Key: CmBillingGroup
-          Value: play_with_aws_web_service_with_ecs
-
   IAMRoleExecuteECSTask:
     Type: AWS::IAM::Role
     Properties:
@@ -275,7 +261,7 @@ Resources:
         - Name: Nginx # 名前
           Image: !Join # イメージURI
             - ''
-            - - !GetAtt ECRRepository.RepositoryUri
+            - - !ImportValue play-with-aws-web-service-with-ecs-ecr
               - ':latest'
           Essential: true # 必須コンテナ
           PortMappings: # ポートマッピング
