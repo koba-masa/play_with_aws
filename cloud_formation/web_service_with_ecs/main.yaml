@@ -160,7 +160,7 @@ Resources:
       Port: 80
       IpAddressType: ipv4
       VpcId: !Ref VPC
-      ProtocolVersion: HTTP2
+      ProtocolVersion: HTTP1
       HealthCheckEnabled: true
       HealthCheckProtocol: HTTP
       HealthCheckPath: /
@@ -268,7 +268,7 @@ Resources:
             - Name: http
               Protocol: tcp
               HostPort: 80
-              AppProtocol: http2
+              AppProtocol: http
               ContainerPort: 80
           ReadonlyRootFilesystem: false # 読み取り専用ルートファイルシステム
           LogConfiguration: # ログ記録
