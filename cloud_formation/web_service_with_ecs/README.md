@@ -4,7 +4,8 @@
 
 ## 手順
 
-### 作成コマンド
+#### スタックの作成
+
 ```sh
 aws cloudformation create-stack \
    --stack-name play-with-aws-web-service-with-ecs-ecr \
@@ -12,6 +13,30 @@ aws cloudformation create-stack \
    --template-body file://ecr.yaml \
    --tags Key=Project,Value=play_with_aws Key=Identifier,Value=web_service_with_ecs Key=CmBillingGroup,Value=play_with_aws_web_service_with_ecs
 ```
+
+#### スタックの更新
+
+```sh
+aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs-ecr \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --template-body file://ecr.yaml
+```
+
+#### スタックの削除
+
+```sh
+aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs-ecr
+```
+
+#### イベントの確認
+
+```sh
+aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs-ecr
+```
+
+### Webアプリケーション環境の構築
+
+#### スタックの作成
 
 ```sh
 aws cloudformation create-stack \
@@ -21,12 +46,7 @@ aws cloudformation create-stack \
    --tags Key=Project,Value=play_with_aws Key=Identifier,Value=web_service_with_ecs Key=CmBillingGroup,Value=play_with_aws_web_service_with_ecs
 ```
 
-### 更新コマンド
-```sh
-aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs-ecr \
-  --capabilities CAPABILITY_NAMED_IAM \
-  --template-body file://ecr.yaml
-```
+#### スタックの更新
 
 ```sh
 aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs \
@@ -34,19 +54,13 @@ aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs 
   --template-body file://main.yaml
 ```
 
-### 削除コマンド
-```sh
-aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs-ecr
-```
+#### スタックの削除
 
 ```sh
 aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs
 ```
 
-### イベント確認コマンド
-```sh
-aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs-ecr
-```
+### イベントの確認
 
 ```sh
 aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs
