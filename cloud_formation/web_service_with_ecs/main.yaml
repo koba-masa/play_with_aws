@@ -205,6 +205,20 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
+  ListenerForALB:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Protocol: HTTP
+      Port: 80
+      DefaultActions: # To create additional rules for an Application Load Balancer, use AWS::ElasticLoadBalancingV2::ListenerRule.
+        - Type: forward
+          # ForwardConfig:
+          #   TargetGroupStickinessConfig: # グループレベルの維持設定
+          #     Enabled: true
+          #     DurationSeconds: 86400
+          TargetGroupArn: !Ref TargetGroupForALB
+
   IAMRoleExecuteECSTask:
     Type: AWS::IAM::Role
     Properties:
