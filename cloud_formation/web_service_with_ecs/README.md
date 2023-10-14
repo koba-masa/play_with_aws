@@ -31,7 +31,7 @@ aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs-
 #### イベントの確認
 
 ```sh
-aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs-ecr
+aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs-ecr --output text
 ```
 
 ### Webアプリケーション環境の構築
@@ -63,5 +63,5 @@ aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs
 ### イベントの確認
 
 ```sh
-aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs
+aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs --output text
 ```
