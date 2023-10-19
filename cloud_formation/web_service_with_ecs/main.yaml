@@ -180,7 +180,9 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: play_with_aws_web_service_with_ecs_for_ecs_alb
+      #GroupName: play_with_aws_web_service_with_ecs_for_alb
       GroupDescription: play_with_aws_web_service_with_ecs_for_ecs
+      #GroupDescription: play_with_aws_web_service_with_ecs_for_alb
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - Description: Allow HTTP access from anywhere
@@ -230,6 +232,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: play_with_aws_web_service_with_ecs_for_ecs_ecs
+      #GroupName: play_with_aws_web_service_with_ecs_for_ecs
       GroupDescription: play_with_aws_web_service_with_ecs_for_ecs
       VpcId: !Ref VPC
       SecurityGroupIngress:
