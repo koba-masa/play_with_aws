@@ -23,6 +23,34 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
+  RouteTableForPublic:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs_public
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  RouteTableForPrivate:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs_private
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
