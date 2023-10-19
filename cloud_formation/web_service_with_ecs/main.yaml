@@ -107,6 +107,9 @@ Resources:
       VpcEndpointType: Gateway
       ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
       VpcId: !Ref VPC
+      RouteTableIds:
+        - !Ref RouteTableForPublic
+        - !Ref RouteTableForPrivate
       PolicyDocument:
         Version: 2012-10-17
         Statement:
