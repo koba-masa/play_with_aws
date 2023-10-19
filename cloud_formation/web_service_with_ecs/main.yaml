@@ -70,6 +70,13 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
+  RouteToInternetGatewayForPublic:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableForPublic
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
   VPCEndpointInterfaceForECRDKR:
     Type: AWS::EC2::VPCEndpoint
     Properties:
