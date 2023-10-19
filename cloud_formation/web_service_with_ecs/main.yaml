@@ -131,6 +131,12 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTableForPublic
+      SubnetId: !Ref PublicSubnet1
+
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
@@ -151,6 +157,12 @@ Resources:
           Value: web_service_with_ecs
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTableForPublic
+      SubnetId: !Ref PublicSubnet2
 
   SecurityGroupForALB:
     Type: AWS::EC2::SecurityGroup
@@ -195,6 +207,12 @@ Resources:
           Value: web_service_with_ecs
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTableForPrivate
+      SubnetId: !Ref PrivateSubnet1
 
   SecurityGroupForECS:
     Type: AWS::EC2::SecurityGroup
