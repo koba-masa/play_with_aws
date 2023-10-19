@@ -85,9 +85,10 @@ Resources:
       VpcId: !Ref VPC
       PrivateDnsEnabled: true
       SubnetIds:
-        - !Ref PrivateSubnet1
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
       SecurityGroupIds:
-        - !Ref SecurityGroupForECS
+        - !Ref SecurityGroupForVPCE
 
   VPCEndpointInterfaceForECRAPI:
     Type: AWS::EC2::VPCEndpoint
@@ -97,9 +98,10 @@ Resources:
       VpcId: !Ref VPC
       PrivateDnsEnabled: true
       SubnetIds:
-        - !Ref PrivateSubnet1
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
       SecurityGroupIds:
-        - !Ref SecurityGroupForECS
+        - !Ref SecurityGroupForVPCE
 
   VPCEndpointGatewayForS3:
     Type: AWS::EC2::VPCEndpoint
@@ -240,6 +242,31 @@ Resources:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
       Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  SecurityGroupForVPCE:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: play_with_aws_web_service_with_ecs_for_vpce
+      GroupDescription: play_with_aws_web_service_with_ecs_for_vpce
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - Description: Allow HTTPS access from ECS
+          IpProtocol: tcp
+          SourceSecurityGroupId: !Ref SecurityGroupForECS
+          FromPort: 443
+          ToPort: 443
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs_for_vpce
         - Key: Project
           Value: play_with_aws
         - Key: Identifier
