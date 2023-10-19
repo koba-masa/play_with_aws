@@ -475,3 +475,52 @@ Resources:
           Value: web_service_with_ecs
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
+
+  ECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSCluster
+      # 環境
+      LaunchType: FARGATE # 起動タイプ
+      PlatformVersion: LATEST # プラットフォームのバージョン
+      # デプロイ設定
+      # アプリケーションタイプ
+      # タスク定義
+      # リビジョンの手動指定
+      TaskDefinition: !Ref ECSTask # ファミリー & リビジョン
+      ServiceName: play_with_aws_web_service_with_ecs # サービス名
+      # サービスタイプ
+      DesiredCount: 1 # 必要なタスク
+      DeploymentController:
+        Type: CODE_DEPLOY
+      DeploymentConfiguration: # デプロイオプション
+        MinimumHealthyPercent: 100 # 最小実行タスク
+        MaximumPercent: 200 # 最大実行タスク
+      NetworkConfiguration: # ネットワーキング
+        AwsvpcConfiguration:
+          Subnets: # サブネット
+            - !Ref PrivateSubnet1
+          SecurityGroups: # セキュリティグループ
+            - !Ref SecurityGroupForECS
+          AssignPublicIp: DISABLED # パブリックIP
+      LoadBalancers: # ロードバランシング
+        - ContainerName: Nginx
+          ContainerPort: 80
+          TargetGroupArn: !Ref TargetGroupForALB
+      # EnableExecuteCommand: Boolean
+      # HealthCheckGracePeriodSeconds: Integer
+      # PlacementStrategies:
+      #   - PlacementStrategy
+      # Role: String
+      # SchedulingStrategy: String
+      EnableECSManagedTags: true # Amazon ECS マネージドタグを有効にする
+      PropagateTags: TASK_DEFINITION # タグの伝播元
+      Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs_public_subnet_1
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
