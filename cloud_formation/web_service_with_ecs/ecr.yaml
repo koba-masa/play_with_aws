@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Web Service with ECS'
+
+Outputs:
+  ECRPrivateRepository:
+    Description: ECR Private Repository For play_with_aws_web_service_with_ecs
+    Value: !GetAtt ECRPrivateRepository.RepositoryUri
+    Export:
+      Name: play-with-aws-web-service-with-ecs-ecr
+
+Resources:
+  ECRPrivateRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: play_with_aws_web_service_with_ecs # リポジトリ名
+      EmptyOnDelete: true
+      ImageTagMutability: MUTABLE # タブのイミュータビリティ
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
