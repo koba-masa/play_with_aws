@@ -414,7 +414,7 @@ Resources:
           ReadonlyRootFilesystem: false # 読み取り専用ルートファイルシステム
           LogConfiguration: # ログ記録
             LogDriver: awslogs
-            Options: { 'awslogs-group': '/ecs/', 'awslogs-region': 'us-west-2', 'awslogs-stream-prefix': 'ecs', 'awslogs-create-group': 'true' }
+            Options: { 'awslogs-group': '/ecs/play_with_aws_web_service_with_ecs', 'awslogs-region': 'us-west-2', 'awslogs-stream-prefix': 'ecs', 'awslogs-create-group': 'true' }
           HealthCheck: # HealthCheck
               Command:
                 - CMD-SHELL
