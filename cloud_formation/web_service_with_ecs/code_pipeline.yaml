@@ -92,3 +92,51 @@ Resources:
       AliasName: alias/play_with_aws_web_service_with_ecs_deploy
       TargetKeyId: !Ref KMSKeyForDeploy
 
+  CodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      # プロジェクトの設定
+      Name: play_with_aws_web_service_with_ecs
+      Description: play_with_aws_web_service_with_ecs
+      BadgeEnabled: false
+      ConcurrentBuildLimit: 1
+      # ソース
+      Source:
+        Type: CODEPIPELINE
+        # Build Spec
+        BuildSpec: buildspec.yaml
+      # 環境
+      ServiceRole: !Ref DeployRole
+      TimeoutInMinutes: 60
+      QueuedTimeoutInMinutes: 480
+      Environment:
+        Image: aws/codebuild/standard:6.0
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: ENVIRONMENT
+            Value: production
+            Type: PLAINTEXT
+      # アーティファクト
+      Artifacts:
+        Type: CODEPIPELINE
+        EncryptionDisabled: false
+      EncryptionKey: !Ref KMSKeyForDeployAlias
+      Cache:
+        Type: NO_CACHE
+      # ログ
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+        S3Logs:
+          Status: DISABLED
+      ResourceAccessRole: !Ref DeployRole
+      Visibility: PRIVATE
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
