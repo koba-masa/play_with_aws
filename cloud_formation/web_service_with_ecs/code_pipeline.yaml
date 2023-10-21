@@ -140,3 +140,16 @@ Resources:
           Value: web_service_with_ecs
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
+
+  CodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: play_with_aws_web_service_with_ecs
+      ComputePlatform: ECS
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
