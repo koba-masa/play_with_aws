@@ -11,7 +11,6 @@
 ```sh
 aws cloudformation create-stack \
    --stack-name play-with-aws-web-service-with-ecs-ecr \
-   --capabilities CAPABILITY_NAMED_IAM \
    --template-body file://ecr.yaml \
    --tags Key=Project,Value=play_with_aws Key=Identifier,Value=web_service_with_ecs Key=CmBillingGroup,Value=play_with_aws_web_service_with_ecs
 ```
@@ -20,7 +19,6 @@ aws cloudformation create-stack \
 
 ```sh
 aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs-ecr \
-  --capabilities CAPABILITY_NAMED_IAM \
   --template-body file://ecr.yaml
 ```
 
