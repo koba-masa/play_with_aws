@@ -6,6 +6,27 @@ Conditions:
   HasNot: !Equals [ "true", "false" ]
 
 Resources:
-  NullResource:
-    Type: Custom::NullResource
-    Condition: HasNot
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_web_service_with_ecs_deploy
+      Description: play_with_aws_web_service_with_ecs
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "codebuild.amazonaws.com"
+                - "codedeploy.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
