@@ -207,6 +207,8 @@ Resources:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
       Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs_for_alb
         - Key: Project
           Value: play_with_aws
         - Key: Identifier
@@ -258,6 +260,8 @@ Resources:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
       Tags:
+        - Key: Name
+          Value: play_with_aws_web_service_with_ecs_for_ecs
         - Key: Project
           Value: play_with_aws
         - Key: Identifier
