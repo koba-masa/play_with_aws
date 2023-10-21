@@ -1,5 +1,6 @@
 .env
 .envrc
+**/cloud_formation_events.md
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,ruby
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,visualstudiocode,ruby
