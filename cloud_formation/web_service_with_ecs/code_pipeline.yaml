@@ -24,6 +24,9 @@ Resources:
               - "sts:AssumeRole"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS
+        - arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+        - arn:aws:iam::aws:policy/AWSCodeDeployDeployerAccess
       Tags:
         - Key: Project
           Value: play_with_aws
@@ -31,6 +34,41 @@ Resources:
           Value: web_service_with_ecs
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
+
+  CodeBuildPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: play_with_aws_web_service_with_ecs_deploy
+      Description: play_with_aws_web_service_with_ecs
+      Roles:
+        - !Ref DeployRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "codestar-connections:UseConnection"
+              - "s3:PutObject"
+              # - "codebuild:StartBuild"
+              # - "codebuild:BatchGetBuilds"
+            Resource:
+              - !ImportValue play-with-aws-web-service-with-ecs-code-star-connection
+              - !Sub "${S3BucketForArtifactStore.Arn}/*"
+              # - !GetAtt CodeBuild.Arn
+          - Effect: Allow
+            Action:
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+            Resource:
+              - "*"
+      # Tags:
+      #   - Key: Project
+      #     Value: play_with_aws
+      #   - Key: Identifier
+      #     Value: web_service_with_ecs
+      #   - Key: CmBillingGroup
+      #     Value: play_with_aws_web_service_with_ecs
 
   KMSKeyForDeploy:
     Type: AWS::KMS::Key
@@ -118,6 +156,15 @@ Resources:
         EnvironmentVariables:
           - Name: ENVIRONMENT
             Value: production
+            Type: PLAINTEXT
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref AWS::AccountId
+            Type: PLAINTEXT
+          - Name: AWS_REGION
+            Value: !Ref AWS::Region
+            Type: PLAINTEXT
+          - Name: ECR
+            Value: !ImportValue play-with-aws-web-service-with-ecs-ecr
             Type: PLAINTEXT
       # アーティファクト
       Artifacts:
@@ -228,6 +275,7 @@ Resources:
 
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
+    DependsOn: CodeBuildPolicy
     Properties:
       Name: play_with_aws_web_service_with_ecs
       RoleArn: !GetAtt DeployRole.Arn

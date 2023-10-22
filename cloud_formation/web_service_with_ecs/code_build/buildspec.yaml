@@ -9,8 +9,11 @@ phases:
   build:
     on-failure: ABORT
     commands:
-      - docker build -t play_with_aws_web_service_with_ecs .$ -f cloud_formation/web_service_with_ecs/docker_files/Dockerfile .
+      - current_dir=`pwd`
+      - cd cloud_formation/web_service_with_ecs/docker_files
+      - docker build -t play_with_aws_web_service_with_ecs  .
       - docker tag play_with_aws_web_service_with_ecs:latest ${ECR}:latest
+      - cd ${current_dir}
 
   post_build:
     commands:
