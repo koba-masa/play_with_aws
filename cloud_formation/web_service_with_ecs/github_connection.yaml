@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Web Service with ECS'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Resources:
+  GitHubConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: pwa_web_service_with_ecs
+      ProviderType: GitHub
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs

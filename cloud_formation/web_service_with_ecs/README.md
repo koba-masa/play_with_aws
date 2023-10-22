@@ -34,6 +34,36 @@ aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs-
 aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs-ecr --output text
 ```
 
+### GitHub Connection
+
+#### スタックの作成
+
+```sh
+aws cloudformation create-stack \
+   --stack-name play-with-aws-web-service-with-ecs-github-connection \
+   --template-body file://github_connection.yaml \
+   --tags Key=Project,Value=play_with_aws Key=Identifier,Value=web_service_with_ecs Key=CmBillingGroup,Value=play_with_aws_web_service_with_ecs
+```
+
+#### スタックの更新
+
+```sh
+aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs-github-connection \
+  --template-body file://github_connection.yaml
+```
+
+#### スタックの削除
+
+```sh
+aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs-github-connection
+```
+
+#### イベントの確認
+
+```sh
+aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs-github-connection --output text
+```
+
 ### Webアプリケーション環境の構築
 
 #### スタックの作成
@@ -60,7 +90,7 @@ aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs 
 aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs
 ```
 
-### イベントの確認
+#### イベントの確認
 
 ```sh
 aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs --output text
@@ -92,8 +122,9 @@ aws cloudformation update-stack --stack-name play-with-aws-web-service-with-ecs-
 aws cloudformation delete-stack --stack-name play-with-aws-web-service-with-ecs-codepipline
 ```
 
-### イベントの確認
+#### イベントの確認
 
 ```sh
 aws cloudformation describe-stack-events --stack-name play-with-aws-web-service-with-ecs-codepipline --output text
 ```
+
