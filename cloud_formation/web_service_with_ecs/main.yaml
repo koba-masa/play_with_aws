@@ -192,10 +192,8 @@ Resources:
   SecurityGroupForALB:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: play_with_aws_web_service_with_ecs_for_ecs_alb
-      #GroupName: play_with_aws_web_service_with_ecs_for_alb
-      GroupDescription: play_with_aws_web_service_with_ecs_for_ecs
-      #GroupDescription: play_with_aws_web_service_with_ecs_for_alb
+      GroupName: play_with_aws_web_service_with_ecs_for_alb
+      GroupDescription: play_with_aws_web_service_with_ecs_for_alb
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - Description: Allow HTTP access from anywhere
@@ -246,8 +244,7 @@ Resources:
   SecurityGroupForECS:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: play_with_aws_web_service_with_ecs_for_ecs_ecs
-      #GroupName: play_with_aws_web_service_with_ecs_for_ecs
+      GroupName: play_with_aws_web_service_with_ecs_for_ecs
       GroupDescription: play_with_aws_web_service_with_ecs_for_ecs
       VpcId: !Ref VPC
       SecurityGroupIngress:
@@ -294,10 +291,42 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
 
-  TargetGroupForALB:
+  TargetGroupForBlue:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: with-aws-web-service-with-ecs
+      Name: web-service-with-ecs-blue
+      TargetType: ip
+      Protocol: HTTP
+      Port: 80
+      IpAddressType: ipv4
+      VpcId: !Ref VPC
+      ProtocolVersion: HTTP1
+      HealthCheckEnabled: true
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /
+      HealthCheckPort: 80
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 5
+      HealthCheckIntervalSeconds: 30
+      Matcher:
+        HttpCode: 200-299
+      # TargetGroupAttributes:
+      #   - TargetGroupAttribute
+      # Targets:
+      #   - TargetDescription
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  TargetGroupForGreen:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: web-service-with-ecs-green
       TargetType: ip
       Protocol: HTTP
       Port: 80
@@ -329,7 +358,7 @@ Resources:
   ALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: pw-aws-web-service-with-ecs
+      Name: web-service-with-ecs
       Type: application
       IpAddressType: ipv4
       Scheme: internet-facing
@@ -360,7 +389,7 @@ Resources:
           #   TargetGroupStickinessConfig: # グループレベルの維持設定
           #     Enabled: true
           #     DurationSeconds: 86400
-          TargetGroupArn: !Ref TargetGroupForALB
+          TargetGroupArn: !Ref TargetGroupForBlue
 
   IAMRoleExecuteECSTask:
     Type: AWS::IAM::Role
@@ -482,6 +511,7 @@ Resources:
 
   ECSService:
     Type: AWS::ECS::Service
+    DependsOn: ListenerForALB
     Properties:
       Cluster: !Ref ECSCluster
       # 環境
@@ -510,7 +540,7 @@ Resources:
       LoadBalancers: # ロードバランシング
         - ContainerName: Nginx
           ContainerPort: 80
-          TargetGroupArn: !Ref TargetGroupForALB
+          TargetGroupArn: !Ref TargetGroupForBlue
       # EnableExecuteCommand: Boolean
       # HealthCheckGracePeriodSeconds: Integer
       # PlacementStrategies:
