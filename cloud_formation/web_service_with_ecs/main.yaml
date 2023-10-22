@@ -5,6 +5,37 @@ Description: 'Web Service with ECS'
 Conditions:
   HasNot: !Equals [ 'true', 'false' ]
 
+Outputs:
+  ECSClusterName:
+    Description: Name of ECS cluster
+    Value: !Ref ECSCluster
+    Export:
+      Name: play-with-aws-web-service-with-ecs-cluster-name
+
+  ECSServicerName:
+    Description: Name of ECS service
+    Value: !GetAtt ECSService.Name
+    Export:
+      Name: play-with-aws-web-service-with-ecs-service-name
+
+  Listener:
+    Description: Arn of listener
+    Value: !GetAtt ListenerForALB.ListenerArn
+    Export:
+      Name: play-with-aws-web-service-with-ecs-listener
+
+  TargetGroupForBlueName:
+    Description: Name of target group for blue
+    Value: !GetAtt TargetGroupForBlue.TargetGroupName
+    Export:
+      Name: play-with-aws-web-service-with-ecs-target-group-for-blue-name
+
+  TargetGroupForGreenName:
+    Description: Name of target group for green
+    Value: !GetAtt TargetGroupForGreen.TargetGroupName
+    Export:
+      Name: play-with-aws-web-service-with-ecs-target-group-for-green-name
+
 Resources:
   VPC:
     Type: AWS::EC2::VPC

@@ -153,3 +153,59 @@ Resources:
           Value: web_service_with_ecs
         - Key: CmBillingGroup
           Value: play_with_aws_web_service_with_ecs
+
+  CodeDeployDeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      # デプロイグループの詳細
+      DeploymentGroupName: ecs # デプロイグループ名
+      ApplicationName: !Ref CodeDeployApplication # アプリケーション名
+      ServiceRoleArn: !GetAtt DeployRole.Arn # サービスロールARN
+      ## デプロイ設定
+      DeploymentConfigName: CodeDeployDefault.ECSAllAtOnce
+      DeploymentStyle:
+        DeploymentType: BLUE_GREEN
+        DeploymentOption: WITH_TRAFFIC_CONTROL
+      BlueGreenDeploymentConfiguration:
+        DeploymentReadyOption:
+          ActionOnTimeout: CONTINUE_DEPLOYMENT
+        # GreenFleetProvisioningOption:
+        #   Action: COPY_AUTO_SCALING_GROUP
+        TerminateBlueInstancesOnDeploymentSuccess:
+          Action: TERMINATE
+          TerminationWaitTimeInMinutes: 5
+      AutoRollbackConfiguration:
+        Enabled: true
+        Events:
+          - DEPLOYMENT_FAILURE
+          - DEPLOYMENT_STOP_ON_REQUEST
+      # 環境設定
+      ECSServices:
+        - ClusterName: !ImportValue play-with-aws-web-service-with-ecs-cluster-name # ECSクラスター名
+          ServiceName: !ImportValue play-with-aws-web-service-with-ecs-service-name # ECSサービス名
+      # Load Balancer
+      LoadBalancerInfo:
+          TargetGroupPairInfoList:
+            - ProdTrafficRoute:
+                ListenerArns:
+                  - !ImportValue play-with-aws-web-service-with-ecs-listener
+              TargetGroups:
+                - Name: !ImportValue play-with-aws-web-service-with-ecs-target-group-for-blue-name
+                - Name: !ImportValue play-with-aws-web-service-with-ecs-target-group-for-green-name
+              # TestTrafficRoute:
+              #   TrafficRoute
+      # トリガー
+      # TriggerConfigurations:
+      #   - TriggerConfig
+      # アラーム
+      # AlarmConfiguration:
+      #   AlarmConfiguration
+      # OnPremisesTagSet:
+      #   OnPremisesTagSet
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
