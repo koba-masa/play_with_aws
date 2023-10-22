@@ -5,6 +5,13 @@ Description: 'Web Service with ECS'
 Conditions:
   HasNot: !Equals [ 'true', 'false' ]
 
+Outputs:
+  CodeStarConnectionArnForGitHub:
+    Description: Arn of CodeStarConnection for GitHub
+    Value: !GetAtt GitHubConnection.ConnectionArn
+    Export:
+      Name: play-with-aws-web-service-with-ecs-code-star-connection
+
 Resources:
   GitHubConnection:
     Type: AWS::CodeStarConnections::Connection
