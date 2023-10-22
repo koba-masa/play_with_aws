@@ -105,7 +105,7 @@ Resources:
       Source:
         Type: CODEPIPELINE
         # Build Spec
-        BuildSpec: buildspec.yaml
+        BuildSpec: cloud_formation/web_service_with_ecs/code_build/buildspec.yaml
       # 環境
       ServiceRole: !Ref DeployRole
       TimeoutInMinutes: 60
