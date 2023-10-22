@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+  build:
+    on-failure: ABORT
+    commands:
+      - docker build -t play_with_aws_web_service_with_ecs .$ -f cloud_formation/web_service_with_ecs/docker_files/Dockerfile .
+      - docker tag play_with_aws_web_service_with_ecs:latest ${ECR}:latest
+
+  post_build:
+    commands:
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/play_with_aws_web_service_with_ecs:latest
+      - echo "Hello, World!" > build_artifact.txt
+
+artifacts:
+  files: build_artifact.txt
