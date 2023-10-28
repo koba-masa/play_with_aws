@@ -18,7 +18,12 @@ phases:
   post_build:
     commands:
       - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/play_with_aws_web_service_with_ecs:latest
-      - echo "Hello, World!" > build_artifact.txt
+      - printf '{"Version":"1.0","ImageURI":"%s"}' ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/play_with_aws_web_service_with_ecs:latest > imageDetail.json
+      - sed -i -e "s/<AWS_ACCOUNT_ID>/${AWS_ACCOUNT_ID}/g" cloud_formation/web_service_with_ecs/code_deploy/taskdef.json
+      - sed -i -e "s/<AWS_REGION>/${AWS_REGION}/g" cloud_formation/web_service_with_ecs/code_deploy/taskdef.json
 
 artifacts:
-  files: build_artifact.txt
+  files:
+    - imageDetail.json
+    - cloud_formation/web_service_with_ecs/code_deploy/taskdef.json
+    - cloud_formation/web_service_with_ecs/code_deploy/appspec.yaml
