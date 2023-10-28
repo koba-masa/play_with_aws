@@ -299,7 +299,7 @@ Resources:
               Configuration:
                 ConnectionArn: !ImportValue play-with-aws-web-service-with-ecs-code-star-connection
                 FullRepositoryId: koba-masa/play_with_aws
-                BranchName: main
+                BranchName: feat/web_service_with_ecs_codepipeline
                 OutputArtifactFormat: CODE_ZIP
               Namespace: SourceVariables
               OutputArtifacts:
