@@ -23,6 +23,7 @@ phases:
       - sed -i -e "s/<AWS_REGION>/${AWS_REGION}/g" cloud_formation/web_service_with_ecs/code_deploy/taskdef.json
 
 artifacts:
+  discard-paths: yes
   files:
     - imageDetail.json
     - cloud_formation/web_service_with_ecs/code_deploy/taskdef.json
