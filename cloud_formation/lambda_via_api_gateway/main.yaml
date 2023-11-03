@@ -6,6 +6,27 @@ Conditions:
   HasNot: !Equals [ 'true', 'false' ]
 
 Resources:
-  NullResource:
-    Type: 'Custom::NullResource'
-    Condition: HasNot
+  IAMRoleExecuteLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_lambda_via_api_gateway
+      Description: play_with_aws_lambda_via_api_gateway
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: lambda_via_api_gateway
+        - Key: CmBillingGroup
+          Value: play_with_aws_lambda_via_api_gateway
+
