@@ -30,3 +30,75 @@ Resources:
         - Key: CmBillingGroup
           Value: play_with_aws_lambda_via_api_gateway
 
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Condition: HasNot
+    Properties:
+      FunctionName: play_with_aws_lambda_via_api_gateway
+      # 一般設定
+      Description: play_with_aws_lambda_via_api_gateway
+      MemorySize: Integer
+      EphemeralStorage:
+        EphemeralStorage
+      Timeout: Integer
+      SnapStart:
+        SnapStart
+      # トリガー
+      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventinvokeconfig.html
+      # アクセス制限
+      Role: String
+      Policy: Json
+      # 送信先
+      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html
+      # 関数URL
+      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-url.html
+      # 環境変数
+      Environment:
+        Environment
+      KmsKeyArn: String
+      # VPC
+      VpcConfig:
+        VpcConfig
+      # モニタリングおよび運用ツール
+      # 同時実行
+      ReservedConcurrentExecutions: Integer
+      # 非同期呼び出し
+      DeadLetterConfig:
+        DeadLetterConfig
+      # コード署名
+      CodeSigningConfigArn: String
+      # データベースプロキシ
+      # ファイルシステム
+      FileSystemConfigs:
+        - FileSystemConfig
+      # ステートマシン
+      # コード
+      PackageType: String
+      Code:
+        Code
+      ImageConfig:
+        ImageConfig
+      # ランタイム設定
+      Runtime: String
+      Handler: String
+      Architectures:
+        - String
+      RuntimeManagementConfig:
+        RuntimeManagementConfig
+      # レイヤー
+      Layers:
+        - String
+      # モニタリング
+      TracingConfig:
+        TracingConfig
+      # エイリアス
+      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html
+      # バージョン
+      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: lambda_via_api_gateway
+        - Key: CmBillingGroup
+          Value: play_with_aws_lambda_via_api_gateway
