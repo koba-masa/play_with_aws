@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'S3 Bucket for Lambda Deployment'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Resources:
+  LambdaDeploymentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: play-with-aws-lambda-deployment
+      # ブロックパブリックアクセス
+      PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+      # アクセスコントロールリスト
+      AccessControl: Private
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: common
+        - Key: CmBillingGroup
+          Value: play_with_aws_common
