@@ -32,69 +32,38 @@ Resources:
 
   LambdaFunction:
     Type: AWS::Lambda::Function
-    Condition: HasNot
     Properties:
       FunctionName: play_with_aws_lambda_via_api_gateway
       # 一般設定
       Description: play_with_aws_lambda_via_api_gateway
-      MemorySize: Integer
+      MemorySize: 128
       EphemeralStorage:
-        EphemeralStorage
-      Timeout: Integer
-      SnapStart:
-        SnapStart
-      # トリガー
-      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventinvokeconfig.html
+        Size: 512
+      Timeout: 3
+      SnapStart: # https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/snapstart.html?icmpid=docs_lambda_help
+        ApplyOn: None
       # アクセス制限
-      Role: String
-      Policy: Json
-      # 送信先
-      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html
-      # 関数URL
-      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-url.html
+      Role: !GetAtt IAMRoleExecuteLambda.Arn
       # 環境変数
       Environment:
-        Environment
-      KmsKeyArn: String
-      # VPC
-      VpcConfig:
-        VpcConfig
+        Variables:
+          LOG_LEVEL: INFO
+          PROJECT: play_with_aws
       # モニタリングおよび運用ツール
       # 同時実行
-      ReservedConcurrentExecutions: Integer
-      # 非同期呼び出し
-      DeadLetterConfig:
-        DeadLetterConfig
-      # コード署名
-      CodeSigningConfigArn: String
-      # データベースプロキシ
-      # ファイルシステム
-      FileSystemConfigs:
-        - FileSystemConfig
-      # ステートマシン
+      # ReservedConcurrentExecutions: Integer
       # コード
-      PackageType: String
+      PackageType: Zip
       Code:
-        Code
-      ImageConfig:
-        ImageConfig
+        S3Bucket: play-with-aws-lambda-deployment
+        S3Key: production/lambda_via_api_gateway.zip
       # ランタイム設定
-      Runtime: String
-      Handler: String
+      Runtime: ruby3.2
+      Handler: src/scripts/lambda/lambda_via_api_gateway.Lambda::LambdaViaApiGateway.call
       Architectures:
-        - String
+        - x86_64
       RuntimeManagementConfig:
-        RuntimeManagementConfig
-      # レイヤー
-      Layers:
-        - String
-      # モニタリング
-      TracingConfig:
-        TracingConfig
-      # エイリアス
-      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-alias.html
-      # バージョン
-      # https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-version.html
+        UpdateRuntimeOn: Auto
       Tags:
         - Key: Project
           Value: play_with_aws

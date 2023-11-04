@@ -45,6 +45,8 @@ aws cloudformation delete-stack --stack-name play-with-aws-lambda-via-api-gatewa
 
 ### ソースコードのデプロイ
 
+#### 初回
+
 ```sh
 zip -r lambda_via_api_gateway.zip ../../src
 aws s3 cp lambda_via_api_gateway.zip s3://play-with-aws-lambda-deployment/production/
