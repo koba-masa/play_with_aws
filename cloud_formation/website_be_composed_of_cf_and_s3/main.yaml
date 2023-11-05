@@ -1,0 +1,130 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Website be composed of CloudFront and S3'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: play-with-aws-website-be-composed-of-cf-and-s3
+      VersioningConfiguration:
+        Status: Suspended
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+      AccessControl: Private
+      LifecycleConfiguration:
+        Rules:
+          - Id: delete_incomplete_multi_part_upload_file
+            AbortIncompleteMultipartUpload:
+                DaysAfterInitiation: 7
+            ExpiredObjectDeleteMarker: false
+            Status: Enabled
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Tag
+          Value: infrastructure_as_code_cf
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Ref S3Bucket
+        Description: create by cloudformation
+        OriginAccessControlOriginType: s3
+        SigningProtocol: sigv4
+        SigningBehavior: always
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        {
+          "Version": "2012-10-17",
+          "Statement": {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "cloudfront.amazonaws.com"
+            },
+            "Action": "s3:GetObject",
+            "Resource": !Join ["", [!GetAtt S3Bucket.Arn, "/*"]],
+            "Condition": {
+              "StringEquals": {
+                "AWS:SourceArn": !Join ["",
+                  [
+                    "arn:aws:cloudfront::",
+                    !Ref AWS::AccountId,
+                    ":distribution/",
+                    !GetAtt CloudFrontDistribution.Id
+                  ]
+                ]
+              }
+            }
+          }
+        }
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: "play_with_aws_website_be_composed_of_cf_and_s3"
+        Enabled: true
+        PriceClass: PriceClass_200
+        HttpVersion: http2
+        IPV6Enabled: false
+        Origins:
+          - Id: DefaultBehaviorBucket
+            DomainName: !Join ["", [!Ref S3Bucket, ".s3.amazonaws.com"]]
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            OriginPath: "/default"
+            S3OriginConfig: {}
+            OriginShield:
+              Enabled: false
+            ConnectionAttempts: 3
+            ConnectionTimeout: 10
+          - Id: SubDirectoryOrigin
+            DomainName: !Join ["", [!Ref S3Bucket, ".s3.amazonaws.com"]]
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            OriginPath: "/sub_directory"
+            S3OriginConfig: {}
+            OriginShield:
+              Enabled: false
+            ConnectionAttempts: 3
+            ConnectionTimeout: 10
+        DefaultCacheBehavior:
+          TargetOriginId: DefaultBehaviorBucket
+          Compress: true
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+        CacheBehaviors:
+          - PathPattern: /sample/*
+            TargetOriginId: SubDirectoryOrigin
+            Compress: true
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: website_be_composed_of_cf_and_s3
+        - Key: CmBillingGroup
+          Value: play_with_aws_website_be_composed_of_cf_and_s3
