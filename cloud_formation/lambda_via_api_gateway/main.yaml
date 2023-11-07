@@ -92,3 +92,50 @@ Resources:
           Value: lambda_via_api_gateway
         - Key: CmBillingGroup
           Value: play_with_aws_lambda_via_api_gateway
+
+  APIGatewaySampleResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref APIGateway
+      ParentId: !GetAtt APIGateway.RootResourceId
+      PathPart: sample
+
+  APIGatewaySampleMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref APIGateway
+      ResourceId: !GetAtt APIGatewaySampleResource.ResourceId
+      HttpMethod: GET
+      Integration:
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+        TimeoutInMillis: 29000
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        # CacheKeyParameters:
+        #   - String
+        # CacheNamespace: String
+        # ConnectionId: String
+        # ConnectionType: String
+        # ContentHandling: String
+        # Credentials: String
+        # IntegrationResponses:
+        #   - IntegrationResponse
+
+        # RequestParameters:
+        #   Key: Value
+        # RequestTemplates:
+        #   Key: Value
+      # メソッドリクエスト
+      AuthorizationType: NONE
+      ApiKeyRequired: false
+      # RequestValidatorId: String
+      # OperationName: String
+      # RequestParameters:
+      #   Key: Value
+      # AuthorizationScopes:
+      #   - String
+      # AuthorizerId: String
+      # MethodResponses:
+      #   - MethodResponse
+      # RequestModels:
+      #   Key: Value
