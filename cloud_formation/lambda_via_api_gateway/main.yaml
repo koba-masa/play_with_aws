@@ -71,3 +71,10 @@ Resources:
           Value: lambda_via_api_gateway
         - Key: CmBillingGroup
           Value: play_with_aws_lambda_via_api_gateway
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "apigateway.amazonaws.com"
