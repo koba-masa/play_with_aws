@@ -139,3 +139,31 @@ Resources:
       #   - MethodResponse
       # RequestModels:
       #   Key: Value
+
+  APIGatewayExampleResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref APIGateway
+      ParentId: !GetAtt APIGateway.RootResourceId
+      PathPart: example
+
+  APIGatewayExampleMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref APIGateway
+      ResourceId: !GetAtt APIGatewayExampleResource.ResourceId
+      HttpMethod: GET
+      Integration:
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+        TimeoutInMillis: 29000
+        IntegrationHttpMethod: POST
+        Type: AWS
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: 200
+      AuthorizationType: NONE
+      ApiKeyRequired: false
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
