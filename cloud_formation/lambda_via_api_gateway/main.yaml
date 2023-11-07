@@ -78,3 +78,17 @@ Resources:
       FunctionName: !Ref LambdaFunction
       Action: "lambda:InvokeFunction"
       Principal: "apigateway.amazonaws.com"
+
+  APIGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: play_with_aws_lambda_via_api_gateway
+      Description: play_with_aws_lambda_via_api_gateway
+      DisableExecuteApiEndpoint: false
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: lambda_via_api_gateway
+        - Key: CmBillingGroup
+          Value: play_with_aws_lambda_via_api_gateway
