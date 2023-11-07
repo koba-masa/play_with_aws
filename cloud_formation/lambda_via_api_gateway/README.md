@@ -51,3 +51,10 @@ aws cloudformation delete-stack --stack-name play-with-aws-lambda-via-api-gatewa
 zip -r lambda_via_api_gateway.zip ../../src
 aws s3 cp lambda_via_api_gateway.zip s3://play-with-aws-lambda-deployment/production/
 ```
+
+### 2回目以降
+
+```sh
+zip -r lambda_via_api_gateway.zip ../../src
+aws lambda update-function-code --function-name play_with_aws_lambda_via_api_gateway --zip-file fileb://lambda_via_api_gateway.zip
+```

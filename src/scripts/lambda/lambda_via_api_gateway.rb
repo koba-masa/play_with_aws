@@ -13,7 +13,7 @@ module Lambda
     end
 
     def execute
-      { response: { statusCode: 200, body: { message: 'Hello, world!' } } }
+      { statusCode: 200, headers: {}, body: { message: 'Hello, world!' }.to_json }
     end
   end
 end
