@@ -13,7 +13,18 @@ module Lambda
     end
 
     def execute
+      puts event
+      puts context
       { statusCode: 200, headers: {}, body: { message: 'Hello, world!' }.to_json }
+    end
+
+  private
+    def event
+      @event
+    end
+
+    def context
+      @context
     end
   end
 end
