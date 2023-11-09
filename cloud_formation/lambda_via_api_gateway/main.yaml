@@ -1,0 +1,169 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Lambda via API Gateway'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Resources:
+  IAMRoleExecuteLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_lambda_via_api_gateway
+      Description: play_with_aws_lambda_via_api_gateway
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: lambda_via_api_gateway
+        - Key: CmBillingGroup
+          Value: play_with_aws_lambda_via_api_gateway
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: play_with_aws_lambda_via_api_gateway
+      # 一般設定
+      Description: play_with_aws_lambda_via_api_gateway
+      MemorySize: 128
+      EphemeralStorage:
+        Size: 512
+      Timeout: 3
+      SnapStart: # https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/snapstart.html?icmpid=docs_lambda_help
+        ApplyOn: None
+      # アクセス制限
+      Role: !GetAtt IAMRoleExecuteLambda.Arn
+      # 環境変数
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+          PROJECT: play_with_aws
+      # モニタリングおよび運用ツール
+      # 同時実行
+      # ReservedConcurrentExecutions: Integer
+      # コード
+      PackageType: Zip
+      Code:
+        S3Bucket: play-with-aws-lambda-deployment
+        S3Key: production/lambda_via_api_gateway.zip
+      # ランタイム設定
+      Runtime: ruby3.2
+      Handler: src/scripts/lambda/lambda_via_api_gateway.Lambda::LambdaViaApiGateway.call
+      Architectures:
+        - x86_64
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: lambda_via_api_gateway
+        - Key: CmBillingGroup
+          Value: play_with_aws_lambda_via_api_gateway
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "apigateway.amazonaws.com"
+
+  APIGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: play_with_aws_lambda_via_api_gateway
+      Description: play_with_aws_lambda_via_api_gateway
+      DisableExecuteApiEndpoint: false
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: lambda_via_api_gateway
+        - Key: CmBillingGroup
+          Value: play_with_aws_lambda_via_api_gateway
+
+  APIGatewaySampleResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref APIGateway
+      ParentId: !GetAtt APIGateway.RootResourceId
+      PathPart: sample
+
+  APIGatewaySampleMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref APIGateway
+      ResourceId: !GetAtt APIGatewaySampleResource.ResourceId
+      HttpMethod: GET
+      Integration:
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+        TimeoutInMillis: 29000
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        # CacheKeyParameters:
+        #   - String
+        # CacheNamespace: String
+        # ConnectionId: String
+        # ConnectionType: String
+        # ContentHandling: String
+        # Credentials: String
+        # IntegrationResponses:
+        #   - IntegrationResponse
+
+        # RequestParameters:
+        #   Key: Value
+        # RequestTemplates:
+        #   Key: Value
+      # メソッドリクエスト
+      AuthorizationType: NONE
+      ApiKeyRequired: false
+      # RequestValidatorId: String
+      # OperationName: String
+      # RequestParameters:
+      #   Key: Value
+      # AuthorizationScopes:
+      #   - String
+      # AuthorizerId: String
+      # MethodResponses:
+      #   - MethodResponse
+      # RequestModels:
+      #   Key: Value
+
+  APIGatewayExampleResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref APIGateway
+      ParentId: !GetAtt APIGateway.RootResourceId
+      PathPart: example
+
+  APIGatewayExampleMethodGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref APIGateway
+      ResourceId: !GetAtt APIGatewayExampleResource.ResourceId
+      HttpMethod: GET
+      Integration:
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+        TimeoutInMillis: 29000
+        IntegrationHttpMethod: POST
+        Type: AWS
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: 200
+      AuthorizationType: NONE
+      ApiKeyRequired: false
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
