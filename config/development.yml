@@ -25,3 +25,9 @@ list_object_with_prefix:
   s3:
     <<: *common_s3
   upload_files: tmp/files/json/sample.json
+get_object_response:
+  s3:
+    <<: *common_s3
+    upload_files:
+      - path: tmp/files/sample.json
+        content_type: application/json
