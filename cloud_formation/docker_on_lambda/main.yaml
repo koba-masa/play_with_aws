@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Docker on Lambda'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Resources:
+  IAMRoleExecuteLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_docker_on_lambda
+      Description: play_with_aws_docker_on_lambda
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: docker_on_lambda
+        - Key: CmBillingGroup
+          Value: play_with_aws_docker_on_lambda
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: play_with_aws_docker_on_lambda
+      # 一般設定
+      Description: play_with_aws_docker_on_lambda
+      MemorySize: 128
+      EphemeralStorage:
+        Size: 512
+      Timeout: 3
+      SnapStart: # https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/snapstart.html?icmpid=docs_lambda_help
+        ApplyOn: None
+      # アクセス制限
+      Role: !GetAtt IAMRoleExecuteLambda.Arn
+      # モニタリングおよび運用ツール
+      # 同時実行
+      # ReservedConcurrentExecutions: Integer
+      # コード
+      PackageType: Image
+      Code:
+        ImageUri: !Sub
+          - ${repository_uri}:latest
+          - repository_uri: !ImportValue play-with-aws-docker-on-lambda-ecr
+      # ランタイム設定
+      Architectures:
+        - x86_64
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: docker_on_lambda
+        - Key: CmBillingGroup
+          Value: play_with_aws_docker_on_lambda

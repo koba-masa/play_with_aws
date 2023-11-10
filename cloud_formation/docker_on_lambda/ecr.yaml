@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Docker on Lambda'
+
+Outputs:
+  ECRPrivateRepository:
+    Description: ECR Private Repository For play_with_aws_docker_on_lambda
+    Value: !GetAtt ECRPrivateRepository.RepositoryUri
+    Export:
+      Name: play-with-aws-docker-on-lambda-ecr
+
+Resources:
+  ECRPrivateRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: play_with_aws_docker_on_lambda # リポジトリ名
+      EmptyOnDelete: true
+      ImageTagMutability: MUTABLE # タブのイミュータビリティ
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: docker_on_lambda
+        - Key: CmBillingGroup
+          Value: play_with_aws_docker_on_lambda
