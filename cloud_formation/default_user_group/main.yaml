@@ -13,6 +13,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/IAMUserChangePassword
         - !Ref RequireToActivateMfaPolicy
+        - !Ref SetupAwsAccessKeyPolicy
 
   RequireToActivateMfaPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -60,3 +61,23 @@ Resources:
             Condition:
               BoolIfExists:
                 aws:MultiFactorAuthPresent: 'false'
+
+  SetupAwsAccessKeyPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: play_with_aws_setup_aws_access_key
+      Description: This policy for setup access key and is attached to the default user group
+      PolicyDocument: # https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ManageOwnAccessKeys
+            Effect: Allow
+            Action:
+              - iam:CreateAccessKey
+              - iam:DeleteAccessKey
+              - iam:GetAccessKeyLastUsed
+              - iam:GetUser
+              - iam:ListAccessKeys
+              - iam:UpdateAccessKey
+              - iam:TagUser
+            Resource: !Sub arn:aws:iam::${AWS::AccountId}:user/${!aws:username}
