@@ -64,3 +64,18 @@ Resources:
             Action:
               - 'sts:AssumeRole'
             Resource: !GetAtt Role.Arn
+
+  User:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: play_with_aws_switch_role
+      LoginProfile:
+        Password: '#Test1234'
+        PasswordResetRequired: true
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: switch_role
+        - Key: CmBillingGroup
+          Value: play_with_aws_switch_role
