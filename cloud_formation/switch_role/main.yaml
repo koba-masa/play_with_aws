@@ -79,3 +79,10 @@ Resources:
           Value: switch_role
         - Key: CmBillingGroup
           Value: play_with_aws_switch_role
+
+  AddUserToGroup:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User
