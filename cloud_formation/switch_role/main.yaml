@@ -16,7 +16,7 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - 's3:ListBucket'
+              - 's3:ListAllMyBuckets'
             Resource: '*'
 
   Role:
