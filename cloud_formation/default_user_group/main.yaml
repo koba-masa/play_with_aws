@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Create Default UserGroup'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Resources:
+  DefaultUserGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: play_with_aws_default_user_group
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/IAMUserChangePassword
+        - !Ref RequireToActivateMfaPolicy
+
+  RequireToActivateMfaPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: play_with_aws_require_to_activate_mfa
+      Description: This policy requires to activate MFA and is attached to the default user group
+      PolicyDocument: # https://docs.aws.amazon.com/ja_jp/IAM/latest/UserGuide/reference_policies_examples_iam_mfa-selfmanage.html
+        Version: '2012-10-17'
+        Statement:
+          - Sid: VisualEditor0
+            Effect: Allow
+            Action:
+              - iam:DeactivateMFADevice
+              - iam:GetMFADevice
+              - iam:DeleteVirtualMFADevice
+              - iam:EnableMFADevice
+              - iam:ResyncMFADevice
+              - iam:UntagMFADevice
+              - iam:TagMFADevice
+              - iam:CreateVirtualMFADevice
+              - iam:ListMFADevices
+              - iam:ListMFADeviceTags
+              - iam:ChangePassword
+            Resource:
+              - !Sub arn:aws:iam::${AWS::AccountId}:user/${!aws:username}
+              - !Sub arn:aws:iam::${AWS::AccountId}:mfa/${!aws:username}
+          - Sid: VisualEditor1
+            Effect: Allow
+            Action:
+              - iam:ListVirtualMFADevices
+              - iam:GetAccountPasswordPolicy
+            Resource: '*'
+          - Sid: VisualEditor2
+            Effect: Deny
+            NotAction:
+              - iam:CreateVirtualMFADevice
+              - iam:EnableMFADevice
+              - iam:ListMFADevices
+              - iam:ListUsers
+              - iam:ListVirtualMFADevices
+              - iam:ResyncMFADevice
+              - iam:ChangePassword
+              - iam:GetAccountPasswordPolicy
+            Resource: '*'
+            Condition:
+              BoolIfExists:
+                aws:MultiFactorAuthPresent: 'false'
