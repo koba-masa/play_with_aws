@@ -46,3 +46,21 @@ Resources:
           Value: switch_role
         - Key: CmBillingGroup
           Value: play_with_aws_switch_role
+
+  Group:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: play_with_aws_switch_role
+
+  GroupPolicy:
+    Type: AWS::IAM::GroupPolicy
+    Properties:
+      PolicyName: allow_switch_role_to_play_with_aws_switch_role
+      GroupName: !Ref Group
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Resource: !GetAtt Role.Arn
