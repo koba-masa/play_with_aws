@@ -86,3 +86,11 @@ Resources:
       GroupName: !Ref Group
       Users:
         - !Ref User
+
+  # MFAの作成をユーザー作成と同時にしてしまうと、初回ログイン時にもMFAコードが要求されるため、各人に作成してもうらことが望ましい
+  # UserMFADevice:
+  #   Type: AWS::IAM::VirtualMFADevice
+  #   Properties:
+  #     VirtualMfaDeviceName: play_with_aws_switch_role
+  #     Users:
+  #       - !Ref User
