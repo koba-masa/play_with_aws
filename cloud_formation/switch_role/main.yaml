@@ -18,3 +18,31 @@ Resources:
             Action:
               - 's3:ListBucket'
             Resource: '*'
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_switch_role
+      Description: This role is used to switch role
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - 'sts:AssumeRole'
+            Condition:
+              Bool:
+                'aws:MultiFactorAuthPresent': 'true'
+      ManagedPolicyArns:
+        - !Ref Policy
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: switch_role
+        - Key: CmBillingGroup
+          Value: play_with_aws_switch_role

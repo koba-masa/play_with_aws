@@ -14,7 +14,7 @@ aws cloudformation create-stack --stack-name play-with-aws-switch-role \
 ### 更新
 
 ```sh
-aws cloudformation create-stack --stack-name play-with-aws-switch-role \
+aws cloudformation update-stack --stack-name play-with-aws-switch-role \
    --capabilities CAPABILITY_NAMED_IAM \
    --template-body file://main.yaml
 ```
