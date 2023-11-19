@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Switch Role'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Resources:
+  Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: play_with_aws_switch_role
+      Description: This policy is used to switch role
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:ListAllMyBuckets'
+            Resource: '*'
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_switch_role
+      Description: This role is used to switch role
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - 'sts:AssumeRole'
+            Condition:
+              Bool:
+                'aws:MultiFactorAuthPresent': 'true'
+      ManagedPolicyArns:
+        - !Ref Policy
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: switch_role
+        - Key: CmBillingGroup
+          Value: play_with_aws_switch_role
+
+  Group:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: play_with_aws_switch_role
+
+  GroupPolicy:
+    Type: AWS::IAM::GroupPolicy
+    Properties:
+      PolicyName: allow_switch_role_to_play_with_aws_switch_role
+      GroupName: !Ref Group
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Resource: !GetAtt Role.Arn
+
+  User:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: play_with_aws_switch_role
+      LoginProfile:
+        Password: '#Test1234'
+        PasswordResetRequired: true
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: switch_role
+        - Key: CmBillingGroup
+          Value: play_with_aws_switch_role
+
+  AddUserToGroup:
+    Type: AWS::IAM::UserToGroupAddition
+    Properties:
+      GroupName: !Ref Group
+      Users:
+        - !Ref User
+
+  # MFAの作成をユーザー作成と同時にしてしまうと、初回ログイン時にもMFAコードが要求されるため、各人に作成してもうらことが望ましい
+  # UserMFADevice:
+  #   Type: AWS::IAM::VirtualMFADevice
+  #   Properties:
+  #     VirtualMfaDeviceName: play_with_aws_switch_role
+  #     Users:
+  #       - !Ref User
