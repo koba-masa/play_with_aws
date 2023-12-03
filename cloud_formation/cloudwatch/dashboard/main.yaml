@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Transform: 'AWS::LanguageExtensions'
+
+Description: 'CloudWatch Dashboard'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Resources:
+  CloudWatchDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: play_with_aws_cloudwatch_dashboard
+      DashboardBody:
+        Fn::ToJsonString:
+          widgets:
+            - type: metric
+              x: 0
+              y: 0
+              width: 12
+              height: 6
+              properties:
+                title: EC2 Instance CPU
+                metrics:
+                  - - AWS/EC2
+                    - CPUUtilization
+                    - InstanceId
+                    - {インスタンスID}
+                period: 300
+                stat: Average
+                region: us-west-2
+                liveData: false
+                legend:
+                  position: right
+
