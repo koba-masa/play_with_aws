@@ -6,6 +6,26 @@ Conditions:
   HasNot: !Equals [ 'true', 'false' ]
 
 Resources:
-  NullResource:
-    Type: 'Custom::NullResource'
-    Condition: HasNot
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_codepipeline_variables
+      Description: This role is used by CodePipeline.
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+                - codebuild.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
