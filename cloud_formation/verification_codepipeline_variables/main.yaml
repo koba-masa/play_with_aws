@@ -92,3 +92,49 @@ Resources:
           Value: codepipeline_variables
         - Key: CmBillingGroup
           Value: play_with_aws_codepipeline_variables
+
+  CodeBuildOutputVariables:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      # プロジェクトの設定
+      Name: pwa_codepipeline_variables_output_variables
+      Description: Output variables for CodePipeline
+      ConcurrentBuildLimit: 1
+      # ソース
+      Source:
+        Type: CODEPIPELINE
+        # BuildSpec
+        BuildSpec: |
+          version: 0.2
+          phases:
+            build:
+              commands: |
+                echo ${VARIABLES_SET_IN_CODEBUILD}
+      # 環境
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: "BUILD_GENERAL1_SMALL"
+        Image: "aws/codebuild/standard:7.0"
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: true
+      ServiceRole: !Ref CodePipelineRole
+      TimeoutInMinutes: 5
+      QueuedTimeoutInMinutes: 480
+      # バッチ設定
+      BadgeEnabled: false
+      # アーティファクト
+      Artifacts:
+        Type: CODEPIPELINE
+      # ログ
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: !Ref CloudWatchLogGroup
+      ResourceAccessRole: !Ref CodePipelineRole
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
