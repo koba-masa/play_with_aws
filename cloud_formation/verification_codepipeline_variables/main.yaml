@@ -29,3 +29,16 @@ Resources:
           Value: codepipeline_variables
         - Key: CmBillingGroup
           Value: play_with_aws_codepipeline_variables
+
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/codebuild/play_with_aws_codepipeline_variables
+      RetentionInDays: 7
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
