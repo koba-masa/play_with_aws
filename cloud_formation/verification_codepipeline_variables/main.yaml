@@ -183,7 +183,12 @@ Resources:
           phases:
             build:
               commands: |
-                echo ${VARIABLES_SET_IN_CODEBUILD}
+                if [ "${VARIABLES_SET_IN_CODEBUILD}" != "" ]; then
+                  echo ${VARIABLES_SET_IN_CODEBUILD}
+                else
+                  echo "VARIABLES_SET_IN_CODEBUILD is not set"
+                  exit 1
+                fi
       # 環境
       Environment:
         Type: LINUX_CONTAINER
