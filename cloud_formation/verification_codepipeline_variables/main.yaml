@@ -5,6 +5,15 @@ Description: 'Verification of CodePipeline variables'
 Conditions:
   HasNot: !Equals [ 'true', 'false' ]
 
+Parameters:
+  CodePipelineArtifactStore:
+    Type: String
+    Description: 'The name of the S3 bucket used to store the artifacts for this pipeline.'
+
+  CodeStarConnectionArn:
+    Type: String
+    Description: 'The ARN of the CodeStar Connection used to connect to the source repository.'
+
 Resources:
   CodePipelineRole:
     Type: AWS::IAM::Role
@@ -35,6 +44,70 @@ Resources:
     Properties:
       LogGroupName: /aws/codebuild/play_with_aws_codepipeline_variables
       RetentionInDays: 7
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
+
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: play_with_aws_codepipeline_variables
+      PipelineType: V2
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodePipelineArtifactStore
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHub
+              RunOrder: 1
+              ActionTypeId: # https://docs.aws.amazon.com/ja_jp/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: 1
+              Configuration:
+                ConnectionArn: !Ref CodeStarConnectionArn
+                FullRepositoryId: koba-masa/sample.koba-masa.com
+                BranchName: main
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+        - Name: Build
+          Actions:
+            - Name: SetVariables
+              ActionTypeId: # https://docs.aws.amazon.com/ja_jp/codepipeline/latest/userguide/action-reference-CodeBuild.html
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref CodeBuildSetVariables
+              InputArtifacts:
+                - Name: SourceArtifact
+              Namespace: SetVariables
+        - Name: BuildOutput
+          Actions:
+            - Name: SetVariables
+              ActionTypeId: # https://docs.aws.amazon.com/ja_jp/codepipeline/latest/userguide/action-reference-CodeBuild.html
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref CodeBuildOutputVariables
+              InputArtifacts:
+                - Name: SourceArtifact
+      # DisableInboundStageTransitions: # 移行の無効化
+      #   - StageName: Build
+      #     Reason: sample
+      RestartExecutionOnUpdate: false
+      # Triggers: # タグプッシュをトリガーにする場合
       Tags:
         - Key: Project
           Value: play_with_aws
