@@ -101,6 +101,7 @@ Resources:
                 Version: 1
               Configuration:
                 ProjectName: !Ref CodeBuildOutputVariables
+                EnvironmentVariables: '[{"name":"VARIABLES_SET_IN_CODEBUILD","value":"#{SetVariables.VARIABLES_SET_IN_CODEBUILD}","type":"PLAINTEXT"}]'
               InputArtifacts:
                 - Name: SourceArtifact
       # DisableInboundStageTransitions: # 移行の無効化
