@@ -184,7 +184,10 @@ Resources:
             build:
               commands: |
                 if [ "${VARIABLES_SET_IN_CODEBUILD}" != "" ]; then
-                  echo ${VARIABLES_SET_IN_CODEBUILD}
+                  for i in `seq 2`
+                  do
+                    echo ${VARIABLES_SET_IN_CODEBUILD}
+                  done
                 else
                   echo "VARIABLES_SET_IN_CODEBUILD is not set"
                   exit 1
