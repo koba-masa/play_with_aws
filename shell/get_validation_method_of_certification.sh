@@ -1,6 +1,11 @@
 #!/bin/sh
 
-AWS_PROFILE=
+###################################################
+# 証明書の検証方法の一覧を取得する
+#  入力: なし
+#  出力: get_validation_method_of_certification.tsv
+###################################################
+
 OUTPUT_FILE="get_validation_method_of_certification.tsv"
 
 function get_regions() {
@@ -17,7 +22,8 @@ function get_validation_method() {
   aws acm describe-certificate --certificate-arn ${certification} --query "Certificate.DomainValidationOptions[].[DomainName, ValidationMethod]"
 }
 
-export AWS_PROFILE=${AWS_PROFILE}
+# -------------------------------------------
+
 export AWS_DEFAULT_OUTPUT="text"
 
 echo "region\tdomain name\tvalidation method" > ${OUTPUT_FILE}
