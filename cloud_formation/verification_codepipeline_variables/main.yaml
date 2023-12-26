@@ -1,0 +1,222 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: 'Verification of CodePipeline variables'
+
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+
+Parameters:
+  CodePipelineArtifactStore:
+    Type: String
+    Description: 'The name of the S3 bucket used to store the artifacts for this pipeline.'
+
+  CodeStarConnectionArn:
+    Type: String
+    Description: 'The ARN of the CodeStar Connection used to connect to the source repository.'
+
+Resources:
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_codepipeline_variables
+      Description: This role is used by CodePipeline.
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+                - codebuild.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
+
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/codebuild/play_with_aws_codepipeline_variables
+      RetentionInDays: 7
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
+
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: play_with_aws_codepipeline_variables
+      PipelineType: V2
+      RoleArn: !GetAtt CodePipelineRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodePipelineArtifactStore
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHub
+              RunOrder: 1
+              ActionTypeId: # https://docs.aws.amazon.com/ja_jp/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: 1
+              Configuration:
+                ConnectionArn: !Ref CodeStarConnectionArn
+                FullRepositoryId: koba-masa/sample.koba-masa.com
+                BranchName: main
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+        - Name: Build
+          Actions:
+            - Name: SetVariables
+              ActionTypeId: # https://docs.aws.amazon.com/ja_jp/codepipeline/latest/userguide/action-reference-CodeBuild.html
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref CodeBuildSetVariables
+              InputArtifacts:
+                - Name: SourceArtifact
+              Namespace: SetVariables
+        - Name: BuildOutput
+          Actions:
+            - Name: SetVariables
+              ActionTypeId: # https://docs.aws.amazon.com/ja_jp/codepipeline/latest/userguide/action-reference-CodeBuild.html
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref CodeBuildOutputVariables
+                EnvironmentVariables: '[{"name":"VARIABLES_SET_IN_CODEBUILD","value":"#{SetVariables.VARIABLES_SET_IN_CODEBUILD}","type":"PLAINTEXT"}]'
+              InputArtifacts:
+                - Name: SourceArtifact
+      # DisableInboundStageTransitions: # 移行の無効化
+      #   - StageName: Build
+      #     Reason: sample
+      RestartExecutionOnUpdate: false
+      # Triggers: # タグプッシュをトリガーにする場合
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
+
+  CodeBuildSetVariables:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      # プロジェクトの設定
+      Name: pwa_codepipeline_variables_set_variables
+      Description: Set variables for CodePipeline
+      ConcurrentBuildLimit: 1
+      # ソース
+      Source:
+        Type: CODEPIPELINE
+        # BuildSpec
+        BuildSpec: |
+          version: 0.2
+          env:
+            exported-variables:
+              - VARIABLES_SET_IN_CODEBUILD
+          phases:
+            build:
+              commands: |
+                export VARIABLES_SET_IN_CODEBUILD="Set in CodeBuild"
+                echo ${VARIABLES_SET_IN_CODEBUILD}
+      # 環境
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: "BUILD_GENERAL1_SMALL"
+        Image: "aws/codebuild/standard:7.0"
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: true
+      ServiceRole: !Ref CodePipelineRole
+      TimeoutInMinutes: 5
+      QueuedTimeoutInMinutes: 480
+      # バッチ設定
+      BadgeEnabled: false
+      # アーティファクト
+      Artifacts:
+        Type: CODEPIPELINE
+      # ログ
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: !Ref CloudWatchLogGroup
+      ResourceAccessRole: !Ref CodePipelineRole
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
+
+  CodeBuildOutputVariables:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      # プロジェクトの設定
+      Name: pwa_codepipeline_variables_output_variables
+      Description: Output variables for CodePipeline
+      ConcurrentBuildLimit: 1
+      # ソース
+      Source:
+        Type: CODEPIPELINE
+        # BuildSpec
+        BuildSpec: |
+          version: 0.2
+          phases:
+            build:
+              commands: |
+                if [ "${VARIABLES_SET_IN_CODEBUILD}" != "" ]; then
+                  for i in `seq 2`
+                  do
+                    echo ${VARIABLES_SET_IN_CODEBUILD}
+                  done
+                else
+                  echo "VARIABLES_SET_IN_CODEBUILD is not set"
+                  exit 1
+                fi
+      # 環境
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: "BUILD_GENERAL1_SMALL"
+        Image: "aws/codebuild/standard:7.0"
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: true
+      ServiceRole: !Ref CodePipelineRole
+      TimeoutInMinutes: 5
+      QueuedTimeoutInMinutes: 480
+      # バッチ設定
+      BadgeEnabled: false
+      # アーティファクト
+      Artifacts:
+        Type: CODEPIPELINE
+      # ログ
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: !Ref CloudWatchLogGroup
+      ResourceAccessRole: !Ref CodePipelineRole
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: codepipeline_variables
+        - Key: CmBillingGroup
+          Value: play_with_aws_codepipeline_variables
