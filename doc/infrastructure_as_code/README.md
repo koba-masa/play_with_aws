@@ -64,7 +64,7 @@
     ```
 1. 各ツールの詳細な手順は各ページを参照する
     - [AWS CloudFormation](/doc/infrastructure_as_code/cloudformation/README.md)
-    - [AWS CDK]()
+    - [AWS CDK](/doc/infrastructure_as_code/cdk/README.md)
     - [Terraform]()
 
 ## 参考
@@ -72,4 +72,5 @@
     - S3
     - CloudFront
       - [オリジンアクセスコントロール](https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-originaccesscontrol.html)
+- AWS CDK
 - [S3 バケットへのアクセス許可をオリジンアクセスコントロールに付与する](https://docs.aws.amazon.com/ja_jp/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html#oac-permission-to-access-s3)
