@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  pre_build:
+    on-failure: ABORT
+    commands:
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+  build:
+    on-failure: ABORT
+    commands:
+      - current_dir=`pwd`
+      - cd cloud_formation/web_service_with_ecs/docker_files
+      - docker build -t play_with_aws_web_service_with_ecs  .
+      - docker tag play_with_aws_web_service_with_ecs:latest ${ECR}:latest
+      - cd ${current_dir}
+
+  post_build:
+    commands:
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/play_with_aws_web_service_with_ecs:latest
+      - printf '{"Version":"1.0","ImageURI":"%s"}' ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/play_with_aws_web_service_with_ecs:latest > imageDetail.json
+      - sed -i -e "s/<AWS_ACCOUNT_ID>/${AWS_ACCOUNT_ID}/g" cloud_formation/web_service_with_ecs/code_deploy/taskdef.json
+      - sed -i -e "s/<AWS_REGION>/${AWS_REGION}/g" cloud_formation/web_service_with_ecs/code_deploy/taskdef.json
+
+artifacts:
+  discard-paths: yes
+  files:
+    - imageDetail.json
+    - cloud_formation/web_service_with_ecs/code_deploy/taskdef.json
+    - cloud_formation/web_service_with_ecs/code_deploy/appspec.yaml

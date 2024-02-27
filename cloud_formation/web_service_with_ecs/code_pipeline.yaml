@@ -1,0 +1,349 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: "CodePipeline for ECS by Blue/Green Deployment"
+
+Conditions:
+  HasNot: !Equals [ "true", "false" ]
+
+Resources:
+  DeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: play_with_aws_web_service_with_ecs_deploy
+      Description: play_with_aws_web_service_with_ecs
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "codepipeline.amazonaws.com"
+                - "codebuild.amazonaws.com"
+                - "codedeploy.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS
+        - arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+        - arn:aws:iam::aws:policy/AWSCodeDeployDeployerAccess
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  CodeBuildPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: play_with_aws_web_service_with_ecs_deploy
+      Description: play_with_aws_web_service_with_ecs
+      Roles:
+        - !Ref DeployRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "codestar-connections:UseConnection"
+              - "s3:PutObject"
+              # - "codebuild:StartBuild"
+              # - "codebuild:BatchGetBuilds"
+            Resource:
+              - !ImportValue play-with-aws-web-service-with-ecs-code-star-connection
+              - !Sub "${S3BucketForArtifactStore.Arn}/*"
+              # - !GetAtt CodeBuild.Arn
+          - Effect: Allow
+            Action:
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+            Resource:
+              - "*"
+      # Tags:
+      #   - Key: Project
+      #     Value: play_with_aws
+      #   - Key: Identifier
+      #     Value: web_service_with_ecs
+      #   - Key: CmBillingGroup
+      #     Value: play_with_aws_web_service_with_ecs
+
+  KMSKeyForDeploy:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: play_with_aws_web_service_with_ecs_deploy
+      Enabled: true # キーのタイプ
+      KeyUsage: ENCRYPT_DECRYPT # キーの使用法
+      KeySpec: SYMMETRIC_DEFAULT
+      Origin: AWS_KMS # キーマテリアルオリジン
+      MultiRegion: false # リージョンごと
+      EnableKeyRotation: true # キーローテーション
+      KeyPolicy: # キーの管理者 & キーの削除 & キーユーザー & 別のAWSアカウント
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action:
+              - "kms:*"
+            Resource: "*"
+          - Sid: "Allow use of the key"
+            Effect: Allow
+            Principal:
+              AWS:
+                - !GetAtt DeployRole.Arn
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: "*"
+          - Sid: Allow attachment of persistent resources
+            Effect: Allow
+            Principal:
+              AWS:
+                - !GetAtt DeployRole.Arn
+            Action:
+              - kms:CreateGrant
+              - kms:ListGrants
+              - kms:RevokeGrant
+            Resource: "*"
+            Condition:
+              Bool:
+                kms:GrantIsForAWSResource: "true"
+      #BypassPolicyLockoutSafetyCheck: Boolean
+      PendingWindowInDays: 7
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  KMSKeyForDeployAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: alias/play_with_aws_web_service_with_ecs_deploy
+      TargetKeyId: !Ref KMSKeyForDeploy
+
+  CodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      # プロジェクトの設定
+      Name: play_with_aws_web_service_with_ecs
+      Description: play_with_aws_web_service_with_ecs
+      BadgeEnabled: false
+      ConcurrentBuildLimit: 1
+      # ソース
+      Source:
+        Type: CODEPIPELINE
+        # Build Spec
+        BuildSpec: cloud_formation/web_service_with_ecs/code_build/buildspec.yaml
+      # 環境
+      ServiceRole: !Ref DeployRole
+      TimeoutInMinutes: 60
+      QueuedTimeoutInMinutes: 480
+      Environment:
+        Image: aws/codebuild/standard:6.0
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: ENVIRONMENT
+            Value: production
+            Type: PLAINTEXT
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref AWS::AccountId
+            Type: PLAINTEXT
+          - Name: AWS_REGION
+            Value: !Ref AWS::Region
+            Type: PLAINTEXT
+          - Name: ECR
+            Value: !ImportValue play-with-aws-web-service-with-ecs-ecr
+            Type: PLAINTEXT
+      # アーティファクト
+      Artifacts:
+        Type: CODEPIPELINE
+        EncryptionDisabled: false
+      EncryptionKey: !Ref KMSKeyForDeployAlias
+      Cache:
+        Type: NO_CACHE
+      # ログ
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+        S3Logs:
+          Status: DISABLED
+      ResourceAccessRole: !Ref DeployRole
+      Visibility: PRIVATE
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  CodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    Properties:
+      ApplicationName: play_with_aws_web_service_with_ecs
+      ComputePlatform: ECS
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  CodeDeployDeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      # デプロイグループの詳細
+      DeploymentGroupName: ecs # デプロイグループ名
+      ApplicationName: !Ref CodeDeployApplication # アプリケーション名
+      ServiceRoleArn: !GetAtt DeployRole.Arn # サービスロールARN
+      ## デプロイ設定
+      DeploymentConfigName: CodeDeployDefault.ECSAllAtOnce
+      DeploymentStyle:
+        DeploymentType: BLUE_GREEN
+        DeploymentOption: WITH_TRAFFIC_CONTROL
+      BlueGreenDeploymentConfiguration:
+        DeploymentReadyOption:
+          ActionOnTimeout: CONTINUE_DEPLOYMENT
+        # GreenFleetProvisioningOption:
+        #   Action: COPY_AUTO_SCALING_GROUP
+        TerminateBlueInstancesOnDeploymentSuccess:
+          Action: TERMINATE
+          TerminationWaitTimeInMinutes: 5
+      AutoRollbackConfiguration:
+        Enabled: true
+        Events:
+          - DEPLOYMENT_FAILURE
+          - DEPLOYMENT_STOP_ON_REQUEST
+      # 環境設定
+      ECSServices:
+        - ClusterName: !ImportValue play-with-aws-web-service-with-ecs-cluster-name # ECSクラスター名
+          ServiceName: !ImportValue play-with-aws-web-service-with-ecs-service-name # ECSサービス名
+      # Load Balancer
+      LoadBalancerInfo:
+          TargetGroupPairInfoList:
+            - ProdTrafficRoute:
+                ListenerArns:
+                  - !ImportValue play-with-aws-web-service-with-ecs-listener
+              TargetGroups:
+                - Name: !ImportValue play-with-aws-web-service-with-ecs-target-group-for-blue-name
+                - Name: !ImportValue play-with-aws-web-service-with-ecs-target-group-for-green-name
+              # TestTrafficRoute:
+              #   TrafficRoute
+      # トリガー
+      # TriggerConfigurations:
+      #   - TriggerConfig
+      # アラーム
+      # AlarmConfiguration:
+      #   AlarmConfiguration
+      # OnPremisesTagSet:
+      #   OnPremisesTagSet
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  S3BucketForArtifactStore:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: play-with-aws-web-service-with-ecs-artifact-store
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Suspended
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs
+
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    DependsOn: CodeBuildPolicy
+    Properties:
+      Name: play_with_aws_web_service_with_ecs
+      RoleArn: !GetAtt DeployRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3BucketForArtifactStore
+        EncryptionKey:
+          Type: KMS
+          Id: !Ref KMSKeyForDeployAlias
+      RestartExecutionOnUpdate: false
+      Stages:
+        - Name: Source # ステージ名
+          Actions:
+            - Name: Source # アクション名
+              RunOrder: 1
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: 1
+              Configuration:
+                ConnectionArn: !ImportValue play-with-aws-web-service-with-ecs-code-star-connection
+                FullRepositoryId: koba-masa/play_with_aws
+                BranchName: feat/web_service_with_ecs_codepipeline
+                OutputArtifactFormat: CODE_ZIP
+              Namespace: SourceVariables
+              OutputArtifacts:
+                - Name: SourceArtifact
+        - Name: Build
+          Actions:
+            - Name: Build
+              RunOrder: 1
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              InputArtifacts:
+                - Name: SourceArtifact
+              Configuration:
+                ProjectName: !Ref CodeBuild
+                PrimarySource: SourceArtifact
+                BatchEnabled: false
+                CombineArtifacts: false
+              Namespace: BuildVariables
+              OutputArtifacts:
+                - Name: BuildArtifact
+        - Name: Deploy
+          Actions:
+            - Name: Deploy
+              RunOrder: 1
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CodeDeploy
+                Version: 1
+              Region: us-west-2
+              InputArtifacts:
+                - Name: BuildArtifact
+              Configuration:
+                ApplicationName: !Ref CodeDeployApplication
+                DeploymentGroupName: !Ref CodeDeployDeploymentGroup
+              Namespace: DeployVariables
+              OutputArtifacts: []
+      Tags:
+        - Key: Project
+          Value: play_with_aws
+        - Key: Identifier
+          Value: web_service_with_ecs
+        - Key: CmBillingGroup
+          Value: play_with_aws_web_service_with_ecs

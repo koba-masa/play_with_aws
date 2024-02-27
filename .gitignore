@@ -1,5 +1,6 @@
 .env
 .envrc
+**/cloud_formation_events.md
 
 cloud_formation/**/*.zip
 
